@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"target": "es2016",
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"sourceMap": true,
+		"paths": {
+			"@configs/*": ["./src/configs/*"],
+			"@models/*": ["./src/models/*"],
+			"@services/*": ["./src/services/*"],
+			"@utils/*": ["./src/utils/*"],
+			"@interfaces/*": ["./src/interfaces/*"],
+			"@types/*": ["./src/types/*"],
+			"@middlewares/*": ["./src/middlewares/*"],
+			"@controllers/*": ["./src/controllers/*"],
+			"@routes/*": ["./src/routes/*"]
+		}
+	}
+}

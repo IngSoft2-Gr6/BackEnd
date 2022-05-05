@@ -1,0 +1,6 @@
+bracketSpacing: true
+semi: true
+endOfLine: "lf"
+singleQuote: false
+useTabs: true
+trailingComma: "es5"
