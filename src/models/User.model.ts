@@ -5,6 +5,7 @@ import {
 	BelongsToMany,
 	ForeignKey,
 	HasMany,
+	DataType,
 } from "sequelize-typescript";
 
 import { Role } from "./Role.model";
@@ -13,7 +14,7 @@ import { IdentityCardType } from "./IdentityCardType.model";
 import { Vehicle } from "./Vehicle.model";
 
 export interface UserAttributes {
-	id: number; // TODO: change to uuidv4
+	id: string; // uuidv4
 	name: string;
 	identityCard: string;
 	identityCardType: number;
@@ -26,6 +27,13 @@ export interface UserAddAttributes extends Omit<UserAttributes, "id"> {}
 
 @Table
 export class User extends Model<UserAttributes, UserAddAttributes> {
+	@Column({
+		type: DataType.UUID,
+		defaultValue: DataType.UUIDV4,
+		primaryKey: true,
+	})
+	id!: string;
+
 	@Column
 	name!: string;
 

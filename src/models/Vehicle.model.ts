@@ -11,7 +11,7 @@ import { VehicleType } from "./VehicleType.model";
 
 export interface VehicleAttributes {
 	id: string; // uuidv4
-	driverId?: number; // uuidv4
+	driverId?: string; // uuidv4
 	vehicleTypeId: number;
 	plate: string;
 	color?: string;
@@ -32,7 +32,7 @@ export class Vehicle extends Model<VehicleAttributes, VehicleAddAttributes> {
 	id!: string;
 
 	@ForeignKey(() => User)
-	driverId!: number;
+	driverId!: string;
 
 	@ForeignKey(() => VehicleType)
 	vehicleTypeId!: number;

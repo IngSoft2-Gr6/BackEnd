@@ -3,7 +3,7 @@ import { Role } from "./Role.model";
 import { User } from "./User.model";
 
 export interface UserRoleAttributes {
-	userId: number;
+	userId: string;
 	roleId: number;
 }
 export interface UserRoleAddAttributes extends UserRoleAttributes {}
@@ -15,7 +15,7 @@ export class UserRole extends Model<UserRoleAttributes, UserRoleAddAttributes> {
 
 	@ForeignKey(() => User)
 	@Column
-	userId!: number;
+	userId!: string;
 
 	@ForeignKey(() => Role)
 	@Column
