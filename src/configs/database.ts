@@ -5,7 +5,7 @@ const DB_USER = process.env.DB_USER || "postgres";
 const DB_PASSWORD = process.env.DB_PASSWORD || "postgres";
 const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_NAME = process.env.DB_NAME || "postgres";
-const DB_PORT = parseInt(process.env.DB_PORT || "5432");
+const DB_PORT = parseInt(String(process.env.DB_PORT)) || 5432;
 
 export const sequelize = new Sequelize({
 	database: DB_NAME,
