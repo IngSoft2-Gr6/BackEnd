@@ -4,14 +4,16 @@ import {
 	Column,
 	BelongsToMany,
 	ForeignKey,
+	HasMany,
 } from "sequelize-typescript";
 
 import { Role } from "./Role.model";
 import { UserRole } from "./UserRole.model";
 import { IdentityCardType } from "./IdentityCardType.model";
+import { Vehicle } from "./Vehicle.model";
 
 export interface UserAttributes {
-	id: number;
+	id: number; // TODO: change to uuidv4
 	name: string;
 	identityCard: string;
 	identityCardType: number;
@@ -44,4 +46,7 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 
 	@BelongsToMany(() => Role, () => UserRole)
 	roles!: Array<Role & { UserRole: UserRole }>;
+
+	@HasMany(() => Vehicle)
+	vehicles!: Vehicle[];
 }
