@@ -6,6 +6,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD || "postgres";
 const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_NAME = process.env.DB_NAME || "postgres";
 const DB_PORT = parseInt(String(process.env.DB_PORT)) || 5432;
+const DB_SCHEMA = process.env.DB_SCHEMA || "public";
 
 export const sequelize = new Sequelize({
 	database: DB_NAME,
@@ -14,6 +15,7 @@ export const sequelize = new Sequelize({
 	password: DB_PASSWORD,
 	host: DB_HOST,
 	port: DB_PORT,
+	schema: DB_SCHEMA,
 	pool: {
 		max: 5,
 		min: 0,
