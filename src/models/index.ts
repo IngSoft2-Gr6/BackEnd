@@ -5,9 +5,11 @@ import { User } from "./User.model";
 import { Role } from "./Role.model";
 import { UserRole } from "./UserRole.model";
 import { IdentityCardType } from "./IdentityCardType.model";
+import { Vehicle } from "./Vehicle.model";
+import { VehicleType } from "./VehicleType.model";
 
 // add models
-const Models = { User, Role, UserRole, IdentityCardType };
+const Models = { User, Role, UserRole, IdentityCardType, Vehicle, VehicleType };
 sequelize.addModels(Object.values(Models));
 const db = { sequelize, Sequelize, Models };
 
