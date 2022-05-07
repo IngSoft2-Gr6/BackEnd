@@ -47,11 +47,15 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	email!: string;
 
 	@Column
-	password?: string;
+	password!: string;
 
 	@Column
 	phone?: string;
 
+	@Column(DataType.TEXT)
+	photo?: string;
+
+	// User has many roles
 	@BelongsToMany(() => Role, () => UserRole)
 	roles!: Array<Role & { UserRole: UserRole }>;
 

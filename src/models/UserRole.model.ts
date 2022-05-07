@@ -10,14 +10,9 @@ export interface UserRoleAddAttributes extends UserRoleAttributes {}
 
 @Table
 export class UserRole extends Model<UserRoleAttributes, UserRoleAddAttributes> {
-	@Column
-	info!: string;
-
 	@ForeignKey(() => User)
-	@Column
 	userId!: string;
 
 	@ForeignKey(() => Role)
-	@Column
 	roleId!: number;
 }
