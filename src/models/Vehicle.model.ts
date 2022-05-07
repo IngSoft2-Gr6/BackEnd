@@ -4,7 +4,9 @@ import {
 	Column,
 	ForeignKey,
 	DataType,
+	HasMany,
 } from "sequelize-typescript";
+import { ParkingHistory } from "./ParkingHistory.model";
 
 import { User } from "./User.model";
 import { VehicleType } from "./VehicleType.model";
@@ -51,4 +53,7 @@ export class Vehicle extends Model<VehicleAttributes, VehicleAddAttributes> {
 
 	@Column
 	year?: number;
+
+	@HasMany(() => ParkingHistory)
+	parkingHistories!: Array<ParkingHistory>;
 }

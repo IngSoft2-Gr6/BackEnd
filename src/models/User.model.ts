@@ -11,6 +11,9 @@ import {
 import { Role } from "./Role.model";
 import { UserRole } from "./UserRole.model";
 import { IdentityCardType } from "./IdentityCardType.model";
+import { ParkingLot } from "./ParkingLot.model";
+import { EmployeeParkingLot } from "./EmployeeParkingLot.model";
+import { Rating } from "./Rating.model";
 import { Vehicle } from "./Vehicle.model";
 
 export interface UserAttributes {
@@ -59,6 +62,19 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	@BelongsToMany(() => Role, () => UserRole)
 	roles!: Array<Role & { UserRole: UserRole }>;
 
+	// Employee can work in multiple parking lots
+	@BelongsToMany(() => ParkingLot, () => EmployeeParkingLot)
+	ParkingsLot!: Array<ParkingLot & { EmployeeParkingLot: EmployeeParkingLot }>;
+
+	// User can rate many parking lots and can be rated by many parking lots
+	@BelongsToMany(() => ParkingLot, () => Rating)
+	RatingDriver!: Array<ParkingLot & { Rating: Rating }>;
+
+	// Owner has many parking lots
+	@HasMany(() => ParkingLot)
+	ParkingLots!: Array<ParkingLot>;
+
+	// Driver has many vehicles
 	@HasMany(() => Vehicle)
 	vehicles!: Array<Vehicle>;
 }
