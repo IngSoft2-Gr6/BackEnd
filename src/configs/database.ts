@@ -24,6 +24,7 @@ export const sequelize = new Sequelize({
 	},
 	define: {
 		paranoid: true,
+		freezeTableName: true,
 	},
 });
 
