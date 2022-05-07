@@ -17,5 +17,5 @@ export class IdentityCardType extends Model<
 	name!: string;
 
 	@HasMany(() => User)
-	users!: User[];
+	users!: Array<User>;
 }

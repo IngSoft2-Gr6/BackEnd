@@ -17,5 +17,5 @@ export class VehicleType extends Model<
 	name!: string;
 
 	@HasMany(() => Vehicle)
-	vehicles!: Vehicle[];
+	vehicles!: Array<Vehicle>;
 }

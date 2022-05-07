@@ -56,5 +56,5 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	roles!: Array<Role & { UserRole: UserRole }>;
 
 	@HasMany(() => Vehicle)
-	vehicles!: Vehicle[];
+	vehicles!: Array<Vehicle>;
 }
