@@ -29,6 +29,19 @@ db.sequelize
 	.sync({ force: process.env.NODE_ENV === "development" })
 	.then(async () => {
 		console.log("Database & tables created!");
+		// create default roles
+		await db.Models.Role.bulkCreate([
+			{ name: "admin" },
+			{ name: "driver" },
+			{ name: "owner" },
+			{ name: "employee" },
+		]);
+		// create default identity card types
+		await db.Models.IdentityCardType.bulkCreate([
+			{ name: "Identity Card" },
+			{ name: "Passport" },
+			{ name: "Driving License" },
+		]);
 	})
 	.then(() => {
 		app.listen(port, () => {
