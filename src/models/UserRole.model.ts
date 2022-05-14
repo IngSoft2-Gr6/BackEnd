@@ -7,6 +7,7 @@ export interface UserRoleAttributes {
 	roleId: number;
 }
 export interface UserRoleAddAttributes extends UserRoleAttributes {}
+export interface UserRolePatchAttributes extends Partial<UserRoleAttributes> {}
 
 @Table
 export class UserRole extends Model<UserRoleAttributes, UserRoleAddAttributes> {

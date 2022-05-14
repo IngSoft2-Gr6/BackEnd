@@ -17,6 +17,7 @@ export interface RatingAttributes {
 	ratingDriver?: number;
 }
 export interface RatingAddAttributes extends RatingAttributes {}
+export interface RatingPatchAttributes extends Partial<RatingAttributes> {}
 
 @Table
 export class Rating extends Model<RatingAttributes, RatingAddAttributes> {

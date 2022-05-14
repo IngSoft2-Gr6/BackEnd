@@ -1,4 +1,10 @@
-import { BelongsToMany, Column, Model, Table } from "sequelize-typescript";
+import {
+	AllowNull,
+	BelongsToMany,
+	Column,
+	Model,
+	Table,
+} from "sequelize-typescript";
 import { User } from "./User.model";
 import { UserRole } from "./UserRole.model";
 
@@ -7,9 +13,11 @@ export interface RoleAttributes {
 	name: string;
 }
 export interface RoleAddAttributes extends Omit<RoleAttributes, "id"> {}
+export interface RolePatchAttributes extends Partial<RoleAttributes> {}
 
 @Table
 export class Role extends Model<RoleAttributes, RoleAddAttributes> {
+	@AllowNull(false)
 	@Column
 	name!: string;
 

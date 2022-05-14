@@ -6,6 +6,8 @@ import {
 	ForeignKey,
 	HasMany,
 	DataType,
+	AllowNull,
+	Unique,
 } from "sequelize-typescript";
 
 import { Role } from "./Role.model";
@@ -27,6 +29,7 @@ export interface UserAttributes {
 	photo?: string;
 }
 export interface UserAddAttributes extends Omit<UserAttributes, "id"> {}
+export interface UserPatchAttributes extends Partial<UserAttributes> {}
 
 @Table
 export class User extends Model<UserAttributes, UserAddAttributes> {
@@ -37,18 +40,23 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	})
 	id!: string;
 
+	@AllowNull(false)
 	@Column
 	name!: string;
 
+	@AllowNull(false)
 	@Column
 	identityCard!: string;
 
 	@ForeignKey(() => IdentityCardType)
 	identityCardType!: number;
 
+	@AllowNull(false)
+	@Unique
 	@Column
 	email!: string;
 
+	@AllowNull(false)
 	@Column
 	password!: string;
 

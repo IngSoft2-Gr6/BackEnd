@@ -1,4 +1,4 @@
-import { HasMany, Column, Model, Table } from "sequelize-typescript";
+import { HasMany, Column, Model, Table, AllowNull } from "sequelize-typescript";
 import { Vehicle } from "./Vehicle.model";
 
 export interface VehicleTypeAttributes {
@@ -7,12 +7,15 @@ export interface VehicleTypeAttributes {
 }
 export interface VehicleTypeAddAttributes
 	extends Omit<VehicleTypeAttributes, "id"> {}
+export interface VehicleTypePatchAttributes
+	extends Partial<VehicleTypeAttributes> {}
 
 @Table
 export class VehicleType extends Model<
 	VehicleTypeAttributes,
 	VehicleTypeAddAttributes
 > {
+	@AllowNull(false)
 	@Column
 	name!: string;
 
