@@ -11,7 +11,8 @@
 		"@models": "./dist/models",
 		"@services": "./dist/services",
 		"@routes": "./dist/routes",
-		"@utils": "./dist/utils"
+		"@utils": "./dist/utils",
+		"@helpers": "./dist/helpers"
 	},
 	"scripts": {
 		"start": "node dist/index.js",

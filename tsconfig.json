@@ -20,7 +20,8 @@
 			"@types/*": ["./src/types/*"],
 			"@middlewares/*": ["./src/middlewares/*"],
 			"@controllers/*": ["./src/controllers/*"],
-			"@routes/*": ["./src/routes/*"]
+			"@routes/*": ["./src/routes/*"],
+			"@helpers/*": ["./src/helpers/*"],
 		}
 	}
 }
