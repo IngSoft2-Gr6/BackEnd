@@ -8,6 +8,8 @@ export interface EmployeeParkingLotAttributes {
 }
 export interface EmployeeParkingLotAddAttributes
 	extends EmployeeParkingLotAttributes {}
+export interface EmployeeParkingLotPatchAttributes
+	extends Partial<EmployeeParkingLotAttributes> {}
 
 @Table
 export class EmployeeParkingLot extends Model<

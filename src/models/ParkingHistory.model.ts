@@ -6,6 +6,7 @@ import {
 	DataType,
 	Default,
 	PrimaryKey,
+	AllowNull,
 } from "sequelize-typescript";
 
 import { ParkingLot } from "./ParkingLot.model";
@@ -24,6 +25,8 @@ export interface ParkingHistoryAttributes {
 }
 export interface ParkingHistoryAddAttributes
 	extends Omit<ParkingHistoryAttributes, "id"> {}
+export interface ParkingHistoryPatchAttributes
+	extends Partial<ParkingHistoryAttributes> {}
 
 @Table
 export class ParkingHistory extends Model<
@@ -53,6 +56,7 @@ export class ParkingHistory extends Model<
 	@Column
 	parkingEndTime?: Date;
 
+	@AllowNull(false)
 	@Column({ defaultValue: 0, type: DataType.DOUBLE })
 	paidAmount?: number;
 
