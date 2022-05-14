@@ -31,19 +31,4 @@ const Models = {
 sequelize.addModels(Object.values(Models));
 const db = { sequelize, Sequelize, Models };
 
-db.sequelize
-	.sync({ force: process.env.NODE_ENV === "development" })
-	.then(async () => {
-		console.log("Database & tables created!");
-
-		// create roles
-		await db.Models.Role.bulkCreate([
-			{ name: "admin" },
-			{ name: "driver" },
-			{ name: "owner" },
-			{ name: "employee" },
-		]);
-	})
-	.catch((err) => console.log("Unable to connect to the database:", err));
-
 export default db;
