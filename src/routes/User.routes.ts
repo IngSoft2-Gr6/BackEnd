@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
 	getAllUsers,
 	getUser,
-	register,
+	signup,
 	login,
 	updateUser,
 	deleteUser,
@@ -11,9 +11,23 @@ import { verifyToken } from "@middlewares/auth.middleware";
 
 const router = Router();
 
+// add swagger documentation
+/**
+ * @swagger
+ * /users:
+ * get:
+ *  description: Get all users
+ * tags:
+ * - Users
+ * produces:
+ * - application/json
+ *
+ * /users/{id}:
+ */
+
 router.route("/").get(getAllUsers);
 
-router.route("/register").post(register);
+router.route("/signup").post(signup);
 
 router.route("/login").post(login);
 
