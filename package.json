@@ -11,7 +11,8 @@
 		"@models": "./dist/models",
 		"@services": "./dist/services",
 		"@routes": "./dist/routes",
-		"@utils": "./dist/utils"
+		"@utils": "./dist/utils",
+		"@helpers": "./dist/helpers"
 	},
 	"scripts": {
 		"start": "node dist/index.js",
@@ -22,8 +23,11 @@
 		"dev": "nodemon -L --watch \"./src/\" -e ts,js,json --exec \"yarn normal-build\""
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^5.0.0",
+		"@types/cookie-parser": "^1.4.3",
 		"@types/cors": "^2.8.12",
 		"@types/express": "^4.17.13",
+		"@types/jsonwebtoken": "^8.5.8",
 		"@types/morgan": "^1.9.3",
 		"@types/node": "^17.0.30",
 		"@types/pg": "^8.6.5",
@@ -35,9 +39,12 @@
 		"typescript": "^4.6.4"
 	},
 	"dependencies": {
+		"bcrypt": "^5.0.1",
+		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",
 		"dotenv": "^16.0.0",
 		"express": "^4.18.1",
+		"jsonwebtoken": "^8.5.1",
 		"module-alias": "^2.2.2",
 		"pg": "^8.7.3",
 		"reflect-metadata": "^0.1.13",
