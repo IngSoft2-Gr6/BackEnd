@@ -10,11 +10,13 @@ import cookieParser from "cookie-parser";
 
 import db from "@models/index";
 
-const { User, Role, UserRole, IdentityCardType } = db.Models;
+const { Role, IdentityCardType } = db.Models;
 
 // Settings
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.API_PORT || 4000;
+
+app.disable("x-powered-by");
 
 // Middlewares
 app.use(cors());
@@ -32,14 +34,14 @@ db.sequelize
 	.then(async () => {
 		console.log("Database & tables created!");
 		// create default roles
-		await db.Models.Role.bulkCreate([
+		await Role.bulkCreate([
 			{ name: "admin" },
 			{ name: "driver" },
 			{ name: "owner" },
 			{ name: "employee" },
 		]);
 		// create default identity card types
-		await db.Models.IdentityCardType.bulkCreate([
+		await IdentityCardType.bulkCreate([
 			{ name: "Identity Card" },
 			{ name: "Passport" },
 			{ name: "Driving License" },
