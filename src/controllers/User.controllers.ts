@@ -2,6 +2,7 @@ import { User } from "@models/User.model";
 import { Role } from "@models/Role.model";
 import { responseJson } from "@helpers/response.helpers";
 import { until } from "@helpers/until.helpers";
+import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -15,16 +16,37 @@ export const getAllUsers = async (_req: any, res: any) => {
 };
 
 export const signup = async (req: any, res: any) => {
-	// TODO: Mail verification
 	const userAtt = { ...req.body, roleId: undefined };
-	const salt = await bcrypt.genSalt(10);
-	userAtt.password = await bcrypt.hash(userAtt.password, salt);
 	const roleId: number = req.body.roleId;
-	const [err, user] = await until(User.create(userAtt, { include: [Role] }));
+
+	// Hash password
+	const salt = await bcrypt.genSalt();
+	userAtt.password = await bcrypt.hash(userAtt.password, salt);
+
+	// Create user
+	let [err, user] = await until(User.create(userAtt, { include: [Role] }));
 	if (err) return responseJson(res, 500, err.message);
 	if (!user) return responseJson(res, 400, "User not created");
-	const [err2, role] = await until(user.$add("role", roleId));
+
+	// Add role
+	const [err2, _role] = await until(user.$add("role", roleId));
 	if (err2) return responseJson(res, 500, err2.message);
+
+	// Create token with user id
+	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
+		expiresIn: "1h",
+	});
+
+	// Send mail for verification
+	const url = `${process.env.FRONT_URL}/users/verify/account?token=${token}`;
+	const [err3, mail] = await until(
+		//TODO: Add more information rather than just the url
+		sendMail(user.email, "Account verification", url)
+	);
+
+	if (err3) return responseJson(res, 500, err3.message);
+	if (!mail) return responseJson(res, 400, "Mail not sent");
+
 	return responseJson(res, 201, "User created successfully", user);
 };
 
@@ -37,7 +59,7 @@ export const login = async (req: any, res: any) => {
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
 	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
-		expiresIn: "30s", // expires in 5 seconds for testing
+		expiresIn: "30s", // expires in 30 seconds for testing
 	});
 	res.cookie("token", token, { httpOnly: true });
 	return responseJson(res, 200, "User logged in successfully", user);
