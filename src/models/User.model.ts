@@ -67,6 +67,10 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	@Column(DataType.TEXT)
 	photo?: string;
 
+	@AllowNull(false)
+	@Column({ defaultValue: false })
+	verified!: boolean;
+
 	// User has many roles
 	@BelongsToMany(() => Role, () => UserRole)
 	roles!: Array<Role & { UserRole: UserRole }>;
