@@ -6,30 +6,24 @@ import {
 	login,
 	updateUser,
 	deleteUser,
+	resetPassword,
+	verifyAccount,
+	recover,
 } from "@controllers/User.controllers";
 import { verifyToken } from "@middlewares/auth.middleware";
 
 const router = Router();
-
-// add swagger documentation
-/**
- * @swagger
- * /users:
- * get:
- *  description: Get all users
- * tags:
- * - Users
- * produces:
- * - application/json
- *
- * /users/{id}:
- */
 
 router.route("/").get(getAllUsers);
 
 router.route("/signup").post(signup);
 
 router.route("/login").post(login);
+
+router.route("/verify/account").post(verifyAccount);
+
+router.route("/password").post(recover);
+router.route("/password/reset").post(resetPassword);
 
 router
 	.route("/profile")
