@@ -1,7 +1,7 @@
 import { User } from "@models/User.model";
 import { Role } from "@models/Role.model";
-import { responseJson } from "@helpers/response.helpers";
-import { until } from "@helpers/until.helpers";
+import { responseJson } from "@helpers/response";
+import { until } from "@helpers/until";
 import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";

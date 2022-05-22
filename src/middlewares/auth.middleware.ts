@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { responseJson } from "@helpers/response.helpers";
+import { responseJson } from "@helpers/response";
 
 export const verifyToken = (req: any, res: any, next: any) => {
 	const token = req.cookies.token;
