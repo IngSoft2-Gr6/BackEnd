@@ -4,10 +4,5 @@ export const responseJson = (
 	message: string,
 	data: any = null
 ) => {
-	const success = status >= 200 && status < 300;
-	res.status(status).json({
-		success,
-		message,
-		data,
-	});
+	res.status(status).json({ message, data });
 };
