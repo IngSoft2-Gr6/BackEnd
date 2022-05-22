@@ -50,6 +50,25 @@ export const signup = async (req: any, res: any) => {
 	return responseJson(res, 201, "User created successfully", user);
 };
 
+export const verifyAccount = async (req: any, res: any) => {
+	const { token } = req.body;
+	if (!token) return responseJson(res, 400, "Token not provided");
+
+	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	if (!decoded) return responseJson(res, 400, "Invalid token");
+
+	// Find user
+	const [err, user] = await until(User.findByPk(decoded.id));
+	if (err) return responseJson(res, 500, "Error retrieving user");
+	if (!user) return responseJson(res, 400, "User not found");
+
+	// Update user
+	const [err2, _updated] = await until(user.update({ verified: true }));
+	if (err2) return responseJson(res, 500, "Error updating user");
+
+	return responseJson(res, 200, "User verified successfully");
+};
+
 export const login = async (req: any, res: any) => {
 	const { email, password } = req.body;
 	const [err, user] = await until(User.findOne({ where: { email } }));
