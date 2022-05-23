@@ -30,4 +30,4 @@ async function until<T>(
 	}
 }
 
-export default { until };
+export default until;

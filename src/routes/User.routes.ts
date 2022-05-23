@@ -10,7 +10,9 @@ import {
 	verifyAccount,
 	recover,
 } from "@controllers/User.controllers";
+
 import { verifyToken } from "@middlewares/auth.middleware";
+import { getUserInfo } from "@middlewares/userInfo.middleware";
 
 const router = Router();
 
@@ -27,9 +29,9 @@ router.route("/password/reset").post(resetPassword);
 
 router
 	.route("/profile")
-	.get(verifyToken, getUser)
-	.patch(verifyToken, updateUser)
-	.delete(verifyToken, deleteUser);
+	.get(getUserInfo, getUser)
+	.patch(getUserInfo, updateUser)
+	.delete(getUserInfo, deleteUser);
 
 router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
