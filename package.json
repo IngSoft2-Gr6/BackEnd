@@ -16,10 +16,13 @@
 	},
 	"scripts": {
 		"start": "node dist/index.js",
+		"start-inspect": "node --inspect dist/index.js",
 		"build": "tsc",
 		"clean": "rm -rf ./dist",
-		"clean-build": "yarn clean && yarn build && yarn start",
+		"clean-build": "yarn clean && yarn build",
 		"normal-build": "yarn build && yarn start",
+		"clean-start": "yarn clean && yarn build && yarn start",
+		"clean-start-inspect": "yarn clean && yarn build && yarn start-inspect",
 		"dev": "nodemon -L --watch \"./src/\" -e ts,js,json --exec \"yarn normal-build\""
 	},
 	"devDependencies": {
