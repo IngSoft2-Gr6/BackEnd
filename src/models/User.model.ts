@@ -25,6 +25,7 @@ export interface UserAttributes {
 	identityCard: string;
 	identityCardType: number;
 	email: string;
+	verified: boolean;
 	password: string;
 	phone?: string;
 	photo?: string;
@@ -76,6 +77,7 @@ export class User extends Model<UserAttributes, UserAddAttributes> {
 	roles!: Array<Role & { UserRole: UserRole }>;
 
 	// Employee can work in multiple parking lots
+	// FIXME: change property name
 	@BelongsToMany(() => ParkingLot, () => EmployeeParkingLot)
 	ParkingsLot!: Array<ParkingLot & { EmployeeParkingLot: EmployeeParkingLot }>;
 
