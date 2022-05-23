@@ -6,7 +6,7 @@ import { responseJson } from "@helpers/response";
 
 import until from "@helpers/until";
 
-export const getUserInfo = async (req: any, res: any, next: any) => {
+export const getCurrentUserInfo = async (req: any, res: any, next: any) => {
 	return verifyToken(req, res, async () => {
 		const userId = res.locals.decoded.id;
 		const [err, user] = await until(

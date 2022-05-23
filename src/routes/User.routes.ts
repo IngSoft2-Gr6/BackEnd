@@ -11,8 +11,7 @@ import {
 	recover,
 } from "@controllers/User.controllers";
 
-import { verifyToken } from "@middlewares/auth.middleware";
-import { getUserInfo } from "@middlewares/userInfo.middleware";
+import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
 
 const router = Router();
 
@@ -27,11 +26,9 @@ router.route("/verify/account").post(verifyAccount);
 router.route("/password").post(recover);
 router.route("/password/reset").post(resetPassword);
 
-router
-	.route("/profile")
-	.get(getUserInfo, getUser)
-	.patch(getUserInfo, updateUser)
-	.delete(getUserInfo, deleteUser);
+// All routes refering to /**/profile/* require userInfo middleware
+router.route("/profile*").all(getCurrentUserInfo);
+router.route("/profile").get(getUser).patch(updateUser).delete(deleteUser);
 
 router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
