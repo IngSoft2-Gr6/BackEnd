@@ -37,6 +37,8 @@ router
 	.patch(verifyToken, updateUser)
 	.delete(verifyToken, deleteUser);
 
+router.use("/parking", require("./Parking.routes").default);
+
 router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
 export default router;
