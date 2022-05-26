@@ -1,5 +1,5 @@
-import { responseJson } from "@helpers/response.helpers";
-import { until } from "@helpers/until.helpers";
+import { responseJson } from "@helpers/response";
+import { until } from "@helpers/until";
 import { ParkingLot } from "@models/ParkingLot.model";
 
 export const getParkingLotInfo = async (req: any, res: any, next: any) => {

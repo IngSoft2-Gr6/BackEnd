@@ -5,8 +5,8 @@ import {
 	ParkingLotAddAttributes,
 	ParkingLotPatchAttributes,
 } from "@models/ParkingLot.model";
-import { responseJson } from "@helpers/response.helpers";
-import { until } from "@helpers/until.helpers";
+import { responseJson } from "@helpers/response";
+import { until } from "@helpers/until";
 
 export const getAllParkings = async (_req: any, res: any) => {
 	// TODO: Add pagination
