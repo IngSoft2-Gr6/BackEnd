@@ -5,6 +5,9 @@ import {
 	Table,
 	DataType,
 	AllowNull,
+	PrimaryKey,
+	Scopes,
+	IsUUID,
 } from "sequelize-typescript";
 import { ParkingLot } from "./ParkingLot.model";
 
@@ -21,6 +24,12 @@ export interface BusinessHoursPatchAttributes
 	extends Partial<BusinessHoursAttributes> {}
 
 @Table
+// remove paranoid mode for this table
+@Scopes(() => ({
+	defaultScope: {
+		paranoid: false,
+	},
+}))
 export class BusinessHours extends Model<
 	BusinessHoursAttributes,
 	BusinessHoursAddAttributes
