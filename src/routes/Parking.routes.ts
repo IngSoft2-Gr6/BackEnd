@@ -1,23 +1,22 @@
 import { Router } from "express";
 import {
 	deleteParking,
-	getcapacity,
-	getfee,
+	getAllParkings,
+	getParking,
 	registerParking,
-	updateBusinessHours,
-	updatefee,
 	updateParking,
 } from "@controllers/Parking.controllers";
+import { getParkingLotInfo } from "@middlewares/parking.middleware";
 
 const router = Router();
-router.route("/:id").post(registerParking);
+
+router.route("/").get(getAllParkings).post(registerParking);
+
+router.route("/:parkingLotId*").all(getParkingLotInfo);
 router
-	.route("/profile/:id")
-	.get(getcapacity)
-	.get(getfee)
+	.route("/:parkingLotId")
+	.get(getParking)
 	.patch(updateParking)
-	.patch(updateBusinessHours)
-	.patch(updatefee)
 	.delete(deleteParking);
 
 export default router;

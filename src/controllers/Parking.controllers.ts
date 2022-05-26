@@ -1,6 +1,10 @@
 import { Role } from "@models/Role.model";
 import { BusinessHours } from "@models/BusinessHours.model";
-import { ParkingLot } from "@models/ParkingLot.model";
+import {
+	ParkingLot,
+	ParkingLotAddAttributes,
+	ParkingLotPatchAttributes,
+} from "@models/ParkingLot.model";
 import { responseJson } from "@helpers/response.helpers";
 import { until } from "@helpers/until.helpers";
 
@@ -12,68 +16,35 @@ export const getAllParkings = async (_req: any, res: any) => {
 	return responseJson(res, 200, "Parking retrieved successfully", parkings);
 };
 
+export const getParking = async (req: any, res: any) => {
+	const parking = res.locals.parkingLot as ParkingLot;
+	return responseJson(res, 200, "Parking retrieved successfully", parking);
+};
+
 export const registerParking = async (req: any, res: any) => {
-	const parkingAtt = { ...req.body };
+	const parkingAtt: ParkingLotAddAttributes = { ...req.body };
+	parkingAtt.ownerId = req.params.id;
+
 	const [err, parking] = await until(ParkingLot.create(parkingAtt));
 	if (err) return responseJson(res, 500, err.message);
 	if (!parking) return responseJson(res, 400, "Parking not created");
-	const [err2] = await until(parking.$add());
-	if (err2) return responseJson(res, 500, err2.message);
 	return responseJson(res, 201, "Parking created successfully", parking);
 };
 
-export const getfee = async (req: any, res: any) => {
-	const parkingId: string = req.params.id || req.decoded.id;
-	if (!parkingId) return responseJson(res, 400, "No parking id provided");
-
-	const [err, parking] = await until(ParkingLot.findByPk(parkingId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!parking.fee) return responseJson(res, 404, "Parking not found");
-
-	return responseJson(
-		res,
-		200,
-		"Parking fee retrieved successfully",
-		parking.fee
-	);
-};
-
-export const getcapacity = async (req: any, res: any) => {
-	const parkingId: string = req.params.id || req.decoded.id;
-	if (!parkingId) return responseJson(res, 400, "No parking id provided");
-
-	const [err, parking] = await until(ParkingLot.findByPk(parkingId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!parking) return responseJson(res, 404, "Parking not found");
-
-	return responseJson(
-		res,
-		200,
-		"Parking fee retrieved successfully",
-		parking.capacity
-	);
-};
-
 export const updateParking = async (req: any, res: any) => {
-	const parkingId: string = req.params.id || req.decoded.id;
-	if (!parkingId) return responseJson(res, 400, "No parking id provided");
+	const parkingFound = res.locals.parkingLot as ParkingLot;
 
-	const [err, parkingFound] = await until(ParkingLot.findByPk(parkingId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!parkingFound) return responseJson(res, 404, "parking not found");
+	const parkingAtt: ParkingLotPatchAttributes = { ...req.body };
 
-	const [err2, businessHoursUpdate] = await until(
-		parkingFound.update(parkingFound)
-	);
+	const [err2, parkingLotUpdate] = await until(parkingFound.update(parkingAtt));
 	if (err2) return responseJson(res, 500, err2.message);
-	if (!businessHoursUpdate)
-		return responseJson(res, 400, "parking not updated");
+	if (!parkingLotUpdate) return responseJson(res, 400, "Parking not updated");
 
 	return responseJson(
 		res,
 		200,
-		"parking updated successfully",
-		businessHoursUpdate
+		"Parking updated successfully",
+		parkingLotUpdate
 	);
 };
 
@@ -103,29 +74,6 @@ export const updateBusinessHours = async (req: any, res: any) => {
 		res,
 		200,
 		"Business hours updated successfully",
-		businessHoursUpdate
-	);
-};
-
-export const updatefee = async (req: any, res: any) => {
-	const parkingId: string = req.params.id || req.decoded.id;
-	if (!parkingId) return responseJson(res, 400, "No parking id provided");
-
-	const [err, parkingFound] = await until(ParkingLot.findByPk(parkingId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!parkingFound) return responseJson(res, 404, "Parking not found");
-
-	const [err2, businessHoursUpdate] = await until(
-		parkingFound.update(parkingFound.fee)
-	);
-	if (err2) return responseJson(res, 500, err2.message);
-	if (!businessHoursUpdate)
-		return responseJson(res, 400, "Parking fee not updated");
-
-	return responseJson(
-		res,
-		200,
-		"Parking fee updated successfully",
 		businessHoursUpdate
 	);
 };
