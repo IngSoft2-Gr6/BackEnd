@@ -7,7 +7,6 @@ import {
 	HasMany,
 	DataType,
 	Unique,
-	IsNull,
 	AllowNull,
 } from "sequelize-typescript";
 
