@@ -73,7 +73,14 @@ export const verifyAccount = async (req: any, res: any) => {
 
 export const login = async (req: any, res: any) => {
 	const { email, password } = req.body;
-	const [err, user] = await until(User.findOne({ where: { email } }));
+
+	if (!email || !password) {
+		return responseJson(res, 400, "Email or password not provided");
+	}
+
+	const [err, user] = await until(
+		User.findOne({ where: { email: (email as string).trim() } })
+	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!user) return responseJson(res, 404, "User not found");
 	const isMatch = await bcrypt.compare(password, user.password);
