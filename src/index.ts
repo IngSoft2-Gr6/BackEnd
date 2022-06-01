@@ -18,6 +18,17 @@ const port = process.env.API_PORT || 4000;
 
 app.disable("x-powered-by");
 
+// Exception handlers
+process.on("uncaughtException", (error) => {
+	console.error("Uncaught exception: ", error);
+	process.exit(1); // exit application
+});
+
+process.on("unhandledRejection", (error, promise) => {
+	console.error("Unhandled promise: ", promise);
+	console.error("The error was: ", error);
+});
+
 // Middlewares
 app.use(cors());
 app.use(morgan("dev"));
