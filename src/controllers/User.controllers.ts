@@ -38,12 +38,14 @@ export const signup = async (req: any, res: any) => {
 	});
 
 	// Send mail for verification
+	console.log("User created successfully", "Sending email");
+	if (!user.email) return responseJson(res, 400, "User email not found");
 	const url = `${process.env.FRONT_URL}/users/verify/account?token=${token}`;
+
 	const [err3, mail] = await until(
 		//TODO: Add more information rather than just the url
-		sendMail(user.email, "Account verification", url)
+		sendMail(user.email!.trim(), "Account verification", url)
 	);
-
 	if (err3) return responseJson(res, 500, err3.message);
 	if (!mail) return responseJson(res, 400, "Mail not sent");
 
