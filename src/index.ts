@@ -30,7 +30,14 @@ process.on("unhandledRejection", (error, promise) => {
 });
 
 // Middlewares
-app.use(cors());
+app.use(
+	cors({
+		origin: [process.env.FRONT_URL as string],
+		credentials: true,
+		exposedHeaders: ["set-cookie"],
+	})
+);
+
 app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
