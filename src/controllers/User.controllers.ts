@@ -33,18 +33,23 @@ export const signup = async (req: any, res: any) => {
 	if (err2) return responseJson(res, 500, err2.message);
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
+	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
 		expiresIn: "1h",
 	});
 
 	// Send mail for verification
 	console.log("User created successfully", "Sending email");
 	if (!user.email) return responseJson(res, 400, "User email not found");
-	const url = `${process.env.FRONT_URL}/users/verify/account?token=${token}`;
 
 	const [err3, mail] = await until(
-		//TODO: Add more information rather than just the url
-		sendMail(user.email!.trim(), "Account verification", url)
+		sendMail({
+			to: user.email,
+			subject: "Account verification",
+			placeholders: {
+				userName: user.name.split(" ")[0],
+				url: `${process.env.FRONT_URL}/users/verify/account?token=${token}`,
+			},
+		})
 	);
 	if (err3) return responseJson(res, 500, err3.message);
 	if (!mail) return responseJson(res, 400, "Mail not sent");
@@ -56,6 +61,7 @@ export const verifyAccount = async (req: any, res: any) => {
 	const { token } = req.body;
 	if (!token) return responseJson(res, 400, "Token not provided");
 
+	// TODO: Add error handling
 	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
@@ -86,8 +92,8 @@ export const login = async (req: any, res: any) => {
 	const isMatch = await bcrypt.compare(password, user.password);
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
-		expiresIn: "30s", // expires in 30 seconds for testing
+	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+		expiresIn: "5m", // expires in 30 seconds for testing
 	});
 	res.cookie("token", token, { httpOnly: true });
 	return responseJson(res, 200, "User logged in successfully", user);
@@ -129,14 +135,20 @@ export const recover = async (req: any, res: any) => {
 	if (!user) return responseJson(res, 404, "User not found");
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
+	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
 		expiresIn: "1h",
 	});
 
 	// Send mail for verification
-	const url = `${process.env.FRONT_URL}/password/reset?token=${token}`;
 	const [err2, mail] = await until(
-		sendMail(user.email, "Password recovery", url)
+		sendMail({
+			to: user.email,
+			subject: "Password recovery",
+			placeholders: {
+				userName: user.name.split(" ")[0],
+				url: `${process.env.FRONT_URL}/users/password/reset?token=${token}`,
+			},
+		})
 	);
 
 	if (err2) return responseJson(res, 500, err2.message);
