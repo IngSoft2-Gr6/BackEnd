@@ -24,7 +24,7 @@ export interface ParkingLotAttributes {
 	fee: number;
 	capacity: number;
 	keyNeeded: boolean;
-	ownerId: number;
+	ownerId: string;
 }
 export interface ParkingLotAddAttributes
 	extends Omit<ParkingLotAttributes, "id"> {}

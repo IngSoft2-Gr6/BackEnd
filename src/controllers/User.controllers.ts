@@ -1,11 +1,11 @@
 import { User } from "@models/User.model";
 import { Role } from "@models/Role.model";
 import { responseJson } from "@helpers/response";
-import { until } from "@helpers/until";
 import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import until from "@helpers/until";
 
 export const getAllUsers = async (_req: any, res: any) => {
 	// TODO: Add pagination
@@ -38,12 +38,14 @@ export const signup = async (req: any, res: any) => {
 	});
 
 	// Send mail for verification
+	console.log("User created successfully", "Sending email");
+	if (!user.email) return responseJson(res, 400, "User email not found");
 	const url = `${process.env.FRONT_URL}/users/verify/account?token=${token}`;
+
 	const [err3, mail] = await until(
 		//TODO: Add more information rather than just the url
-		sendMail(user.email, "Account verification", url)
+		sendMail(user.email!.trim(), "Account verification", url)
 	);
-
 	if (err3) return responseJson(res, 500, err3.message);
 	if (!mail) return responseJson(res, 400, "Mail not sent");
 
@@ -71,7 +73,14 @@ export const verifyAccount = async (req: any, res: any) => {
 
 export const login = async (req: any, res: any) => {
 	const { email, password } = req.body;
-	const [err, user] = await until(User.findOne({ where: { email } }));
+
+	if (!email || !password) {
+		return responseJson(res, 400, "Email or password not provided");
+	}
+
+	const [err, user] = await until(
+		User.findOne({ where: { email: (email as string).trim() } })
+	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!user) return responseJson(res, 404, "User not found");
 	const isMatch = await bcrypt.compare(password, user.password);
@@ -137,28 +146,19 @@ export const recover = async (req: any, res: any) => {
 };
 
 export const getUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-
-	const [err, user] = await until(User.findByPk(userId, { include: [Role] }));
-	if (err) return responseJson(res, 500, err.message);
-	if (!user) return responseJson(res, 404, "User not found");
-
-	return responseJson(res, 200, "User retrieved successfully", user);
+	// Make sure userInfo middleware is run before this
+	return responseJson(res, 200, "User retrieved successfully", res.locals.user);
 };
 
 export const updateUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-	const user = { ...req.body, roleId: undefined };
+	const newUserInfo = { ...req.body, roleId: undefined };
+
 	let roleId: number | number[] = req.body.roleId;
-	if (!roleId) return responseJson(res, 400, "No role id provided");
 
-	const [err, userFound] = await until(User.findByPk(userId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!userFound) return responseJson(res, 404, "User not found");
+	// Make sure userInfo middleware is run before this
+	const userFound = res.locals.user as User;
 
-	const [err2, userUpdated] = await until(userFound.update(user));
+	const [err2, userUpdated] = await until(userFound.update(newUserInfo));
 	if (err2) return responseJson(res, 500, err2.message);
 	if (!userUpdated) return responseJson(res, 400, "User not updated");
 
@@ -184,13 +184,12 @@ export const updateUser = async (req: any, res: any) => {
 };
 
 export const deleteUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-	const [err, user] = await until(User.findByPk(userId));
+	const user = res.locals.user as User;
+
+	const [err, userDeleted] = await until(user.destroy());
+
 	if (err) return responseJson(res, 500, err.message);
-	if (!user) return responseJson(res, 404, "User not found");
-	const [err2, userDeleted] = await until(user.destroy({ include: [Role] }));
-	if (err2) return responseJson(res, 500, err2.message);
 	if (!userDeleted) return responseJson(res, 400, "User not deleted");
-	return responseJson(res, 200, "User deleted successfully", userDeleted);
+
+	return responseJson(res, 200, "User deleted successfully", user);
 };

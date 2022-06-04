@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "clean-build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "yarn: clean-build",
+			"detail": "yarn clean && yarn build"
+		}
+	]
+}
