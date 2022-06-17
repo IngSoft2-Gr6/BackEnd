@@ -9,7 +9,7 @@ import until from "@helpers/until";
 
 export const getAllUsers = async (_req: any, res: any) => {
 	// TODO: Add pagination
-	const [err, users] = await until(User.findAll({ include: [Role] }));
+	const [err, users] = await until(User.findAll({ include: [{ all: true }] }));
 	if (err) return responseJson(res, 500, err.message);
 	if (!users) return responseJson(res, 204, "No users found");
 	return responseJson(res, 200, "User retrieved successfully", users);
@@ -95,8 +95,12 @@ export const login = async (req: any, res: any) => {
 	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
 		expiresIn: "5m", // expires in 30 seconds for testing
 	});
+	const expiresIn = new Date(Date.now() + 1000 * 60 * 5); // expires in 5 minutes
 	res.cookie("token", token, { httpOnly: true });
-	return responseJson(res, 200, "User logged in successfully", user);
+	return responseJson(res, 200, "User logged in successfully", {
+		...user,
+		expiresIn,
+	});
 };
 
 export const resetPassword = async (req: any, res: any) => {

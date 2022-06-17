@@ -9,9 +9,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import db from "@models/index";
-import { VehicleType } from "@models/VehicleType.model";
-
-const { Role, IdentityCardType } = db.Models;
+import generate from "./data";
 
 // Settings
 const app = express();
@@ -52,21 +50,7 @@ db.sequelize
 	.sync({ force: process.env.NODE_ENV === "development" })
 	.then(async () => {
 		console.log("Database & tables created!");
-		// create default roles
-		await Role.bulkCreate([
-			{ name: "admin" },
-			{ name: "driver" },
-			{ name: "owner" },
-			{ name: "employee" },
-		]);
-		// create default identity card types
-		await IdentityCardType.bulkCreate([
-			{ name: "Identity Card" },
-			{ name: "Passport" },
-			{ name: "Driving License" },
-		]);
-
-		await VehicleType.bulkCreate([{ name: "Car" }, { name: "Motorcycle" }]);
+		await generate(["Role", "IdentityCardType", "VehicleType"]);
 	})
 	.then(() => {
 		app.listen(port, () => {
