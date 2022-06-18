@@ -12,7 +12,6 @@ import {
 } from "@controllers/User.controllers";
 
 import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
-import { addVehicleByDriver } from "@controllers/Vehicle.controller";
 
 const router = Router();
 
@@ -30,10 +29,6 @@ router.route("/password/reset").post(resetPassword);
 // All routes refering to /**/profile/* require userInfo middleware
 router.route("/profile*").all(getCurrentUserInfo);
 router.route("/profile").get(getUser).patch(updateUser).delete(deleteUser);
-
-// All routes refering to /**/vehicles/* require userInfo middleware
-router.route("/vehicles*").all(getCurrentUserInfo);
-router.route("/vehicles").post(addVehicleByDriver);
 
 // router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 // FIXME: This should use a custom middleware and different controllers
