@@ -7,6 +7,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import until from "@helpers/until";
 
+const { JWT_SECRET, FRONT_URL } = process.env as {
+	[key: string]: string;
+};
+
 export const getAllUsers = async (_req: any, res: any) => {
 	// TODO: Add pagination
 	const [err, users] = await until(User.findAll({ include: [{ all: true }] }));
@@ -33,7 +37,7 @@ export const signup = async (req: any, res: any) => {
 	if (err2) return responseJson(res, 500, err2.message);
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
 		expiresIn: "1h",
 	});
 
@@ -47,7 +51,7 @@ export const signup = async (req: any, res: any) => {
 			subject: "Account verification",
 			placeholders: {
 				userName: user.name.split(" ")[0],
-				url: `${process.env.FRONT_URL}/users/verify/account?token=${token}`,
+				url: `${FRONT_URL}/users/verify/account?token=${token}`,
 			},
 		})
 	);
@@ -62,7 +66,7 @@ export const verifyAccount = async (req: any, res: any) => {
 	if (!token) return responseJson(res, 400, "Token not provided");
 
 	// TODO: Add error handling
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	// Find user
@@ -109,7 +113,7 @@ export const resetPassword = async (req: any, res: any) => {
 	if (!token) return responseJson(res, 400, "Token not provided");
 
 	// verify token
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	const [err, user] = await until(User.findOne({ where: { id: decoded.id } }));
@@ -139,7 +143,7 @@ export const recover = async (req: any, res: any) => {
 	if (!user) return responseJson(res, 404, "User not found");
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
 		expiresIn: "1h",
 	});
 
@@ -150,7 +154,7 @@ export const recover = async (req: any, res: any) => {
 			subject: "Password recovery",
 			placeholders: {
 				userName: user.name.split(" ")[0],
-				url: `${process.env.FRONT_URL}/users/password/reset?token=${token}`,
+				url: `${FRONT_URL}/users/password/reset?token=${token}`,
 			},
 		})
 	);
