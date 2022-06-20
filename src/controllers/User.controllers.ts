@@ -5,9 +5,11 @@ import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import ms from "ms";
 import until from "@helpers/until";
+import { addMilliseconds } from "date-and-time";
 
-const { JWT_SECRET, FRONT_URL } = process.env as {
+const { JWT_SECRET, USER_TOKEN_EXPIRATION_TIME, FRONT_URL } = process.env as {
 	[key: string]: string;
 };
 
@@ -96,14 +98,17 @@ export const login = async (req: any, res: any) => {
 	const isMatch = await bcrypt.compare(password, user.password);
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-		expiresIn: "5m", // expires in 30 seconds for testing
+	// Expiration time between the token and cookie might differ by a few milliseconds
+	const expires = addMilliseconds(new Date(), ms(USER_TOKEN_EXPIRATION_TIME));
+
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: USER_TOKEN_EXPIRATION_TIME,
 	});
-	const expiresIn = new Date(Date.now() + 1000 * 60 * 5); // expires in 5 minutes
-	res.cookie("token", token, { httpOnly: true });
+
+	res.cookie("token", token, { httpOnly: true, expires });
 	return responseJson(res, 200, "User logged in successfully", {
 		...user,
-		expiresIn,
+		expires,
 	});
 };
 
