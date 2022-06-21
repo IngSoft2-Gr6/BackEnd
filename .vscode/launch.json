@@ -5,6 +5,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"command": "yarn normal-build-start-inspect",
+			"name": "Normal start inspect",
+			"request": "launch",
+			"type": "node-terminal"
+		},
+		{
+			"command": "yarn normal-build-start",
+			"name": "Normal start",
+			"request": "launch",
+			"type": "node-terminal"
+		},
+		{
 			"command": "yarn clean-start",
 			"name": "Clean start",
 			"request": "launch",
