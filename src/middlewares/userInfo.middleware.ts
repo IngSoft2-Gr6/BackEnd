@@ -11,6 +11,8 @@ const { USER_VERIFICATION_THRESHOLD_TIME } = process.env as {
 };
 
 export const getCurrentUserInfo = async (req: any, res: any, next: any) => {
+	if (res.locals.user) return next();
+
 	return verifyToken(req, res, async () => {
 		const userId = res.locals.decoded.id;
 		const [err, user] = await until(
@@ -21,7 +23,7 @@ export const getCurrentUserInfo = async (req: any, res: any, next: any) => {
 		if (!user) return responseJson(res, 404, "User not found");
 
 		res.locals.user = user;
-		next();
+		return next();
 	});
 };
 
