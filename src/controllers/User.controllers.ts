@@ -216,6 +216,7 @@ export const updateUser = async (req: any, res: any) => {
 export const deleteUser = async (req: any, res: any) => {
 	const user = res.locals.user as User;
 
+	//FIXME: Verified should be set to false
 	const [err, userDeleted] = await until(user.destroy());
 
 	if (err) return responseJson(res, 500, err.message);

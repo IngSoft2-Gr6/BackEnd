@@ -89,6 +89,8 @@ export const updateParking = async (req: any, res: any) => {
 };
 
 export const updateBusinessHours = async (req: any, res: any) => {
+	//FIXME: Check that the user who is updating this ParkingLot is the owner
+
 	const { id: parkingLotId } = res.locals.parkingLot as ParkingLot;
 
 	const businessHoursNew: BusinessHoursPatchAttributes[] = req.body;
@@ -143,6 +145,8 @@ export const updateBusinessHours = async (req: any, res: any) => {
 };
 
 export const deleteBusinessHours = async (req: any, res: any) => {
+	//FIXME: Check that the user who is updating this ParkingLot is the owner
+
 	const { id: parkingLotId } = res.locals.parkingLot as ParkingLot;
 	const { days }: { days: number[] } = req.body;
 

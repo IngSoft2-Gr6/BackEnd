@@ -1,11 +1,11 @@
 import { addVehicleByDriver } from "@controllers/Vehicle.controller";
-import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
+import { getCurrentVerifiedUserInfo } from "@middlewares/userInfo.middleware";
 import { Router } from "express";
 
 const router = Router();
 
 // All routes refering to /**/vehicles/* require userInfo middleware
-router.use(getCurrentUserInfo);
+router.use(getCurrentVerifiedUserInfo);
 router.route("/").post(addVehicleByDriver);
 
 export default router;
