@@ -5,7 +5,18 @@ import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import ms from "ms";
 import until from "@helpers/until";
+import { addMilliseconds } from "date-and-time";
+
+const {
+	JWT_SECRET,
+	USER_TOKEN_EXPIRATION_TIME,
+	FRONT_URL,
+	MAIL_TOKEN_EXPIRATION_TIME,
+} = process.env as {
+	[key: string]: string;
+};
 
 export const getAllUsers = async (_req: any, res: any) => {
 	// TODO: Add pagination
@@ -33,8 +44,8 @@ export const signup = async (req: any, res: any) => {
 	if (err2) return responseJson(res, 500, err2.message);
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-		expiresIn: "1h",
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
@@ -47,7 +58,7 @@ export const signup = async (req: any, res: any) => {
 			subject: "Account verification",
 			placeholders: {
 				userName: user.name.split(" ")[0],
-				url: `${process.env.FRONT_URL}/users/verify/account?token=${token}`,
+				url: `${FRONT_URL}/users/verify/account?token=${token}`,
 			},
 		})
 	);
@@ -62,7 +73,7 @@ export const verifyAccount = async (req: any, res: any) => {
 	if (!token) return responseJson(res, 400, "Token not provided");
 
 	// TODO: Add error handling
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	// Find user
@@ -92,14 +103,17 @@ export const login = async (req: any, res: any) => {
 	const isMatch = await bcrypt.compare(password, user.password);
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-		expiresIn: "5m", // expires in 30 seconds for testing
+	// Expiration time between the token and cookie might differ by a few milliseconds
+	const expires = addMilliseconds(new Date(), ms(USER_TOKEN_EXPIRATION_TIME));
+
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: USER_TOKEN_EXPIRATION_TIME,
 	});
-	const expiresIn = new Date(Date.now() + 1000 * 60 * 5); // expires in 5 minutes
-	res.cookie("token", token, { httpOnly: true });
+
+	res.cookie("token", token, { httpOnly: true, expires });
 	return responseJson(res, 200, "User logged in successfully", {
 		...user,
-		expiresIn,
+		expires,
 	});
 };
 
@@ -109,7 +123,7 @@ export const resetPassword = async (req: any, res: any) => {
 	if (!token) return responseJson(res, 400, "Token not provided");
 
 	// verify token
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	const [err, user] = await until(User.findOne({ where: { id: decoded.id } }));
@@ -139,8 +153,8 @@ export const recover = async (req: any, res: any) => {
 	if (!user) return responseJson(res, 404, "User not found");
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-		expiresIn: "1h",
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
@@ -150,7 +164,7 @@ export const recover = async (req: any, res: any) => {
 			subject: "Password recovery",
 			placeholders: {
 				userName: user.name.split(" ")[0],
-				url: `${process.env.FRONT_URL}/users/password/reset?token=${token}`,
+				url: `${FRONT_URL}/users/password/reset?token=${token}`,
 			},
 		})
 	);
