@@ -9,7 +9,12 @@ import ms from "ms";
 import until from "@helpers/until";
 import { addMilliseconds } from "date-and-time";
 
-const { JWT_SECRET, USER_TOKEN_EXPIRATION_TIME, FRONT_URL } = process.env as {
+const {
+	JWT_SECRET,
+	USER_TOKEN_EXPIRATION_TIME,
+	FRONT_URL,
+	MAIL_TOKEN_EXPIRATION_TIME,
+} = process.env as {
 	[key: string]: string;
 };
 
@@ -40,7 +45,7 @@ export const signup = async (req: any, res: any) => {
 
 	// Create token with user id
 	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-		expiresIn: "1h",
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
@@ -149,7 +154,7 @@ export const recover = async (req: any, res: any) => {
 
 	// Create token with user id
 	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-		expiresIn: "1h",
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
