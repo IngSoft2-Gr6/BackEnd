@@ -5,7 +5,7 @@ export const verifyToken = (req: any, res: any, next: any) => {
 	const token = req.cookies.token;
 	if (!token) return responseJson(res, 401, "No token provided", null);
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
+		const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
 		res.locals.decoded = decoded;
 		next();
 	} catch (err) {
