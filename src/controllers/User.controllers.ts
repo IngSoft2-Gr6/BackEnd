@@ -114,6 +114,18 @@ export const login = async (req: any, res: any) => {
 	const isMatch = await bcrypt.compare(password, user.password);
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
+	const isEmployee = req.body.token;
+	if (isEmployee) {
+		// If user isEmployee assign to the corresponding parkingLot
+		verifyEmployeeToken(req, res);
+		const [err, rolesToAdd] = await until(user.$add("roles", 4));
+		if (err) return responseJson(res, 500, err.message);
+		if (!rolesToAdd) return responseJson(res, 400, "Roles not added");
+
+		res.locals.user = user;
+		await assignEmployee(req, res);
+	}
+
 	// Expiration time between the token and cookie might differ by a few milliseconds
 	const expires = addMilliseconds(new Date(), ms(USER_TOKEN_EXPIRATION_TIME));
 
