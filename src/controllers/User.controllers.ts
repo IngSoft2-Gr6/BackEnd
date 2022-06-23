@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import ms from "ms";
 import until from "@helpers/until";
 import { addMilliseconds } from "date-and-time";
+import { assignEmployee, verifyEmployeeToken } from "./Employee.controllers";
 
 const {
 	JWT_SECRET,
@@ -29,6 +30,10 @@ export const getAllUsers = async (_req: any, res: any) => {
 export const signup = async (req: any, res: any) => {
 	const userAtt = { ...req.body, roleId: undefined };
 	const roleId: number = req.body.roleId;
+
+	const isEmployee = req.body.token && roleId == 4;
+
+	if (isEmployee) verifyEmployeeToken(req, res);
 
 	// Hash password
 	const salt = await bcrypt.genSalt();
@@ -64,6 +69,12 @@ export const signup = async (req: any, res: any) => {
 	);
 	if (err3) return responseJson(res, 500, err3.message);
 	if (!mail) return responseJson(res, 400, "Mail not sent");
+
+	// if user isEmployee assign to the corresponding parkingLot
+	if (isEmployee) {
+		res.locals.user = user;
+		await assignEmployee(req, res);
+	}
 
 	return responseJson(res, 201, "User created successfully", user);
 };
