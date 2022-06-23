@@ -1,7 +1,7 @@
 export const responseJson = (
 	res: any,
 	status: number,
-	message: string,
+	message?: string,
 	data: any = null
 ) => {
 	// TODO: Add warnings to response
