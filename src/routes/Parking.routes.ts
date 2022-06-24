@@ -10,7 +10,11 @@ import {
 } from "@controllers/Parking.controllers";
 import { getParkingLotInfo } from "@middlewares/parking.middleware";
 import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
-import { addEmployee, getEmployees } from "@controllers/Employee.controllers";
+import {
+	addEmployee,
+	deleteEmployee,
+	getEmployees,
+} from "@controllers/Employee.controllers";
 
 const router = Router();
 
@@ -28,6 +32,9 @@ router
 	.get(getCurrentUserInfo, getEmployees)
 	.post(getCurrentUserInfo, addEmployee);
 
+router
+	.route("/:parkingLotId/employee/:employeeId")
+	.delete(getCurrentUserInfo, deleteEmployee);
 
 router
 	.route("/:parkingLotId/businessHours")
