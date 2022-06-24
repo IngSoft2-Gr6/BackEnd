@@ -11,7 +11,7 @@ export interface EmployeeParkingLotAddAttributes
 export interface EmployeeParkingLotPatchAttributes
 	extends Partial<EmployeeParkingLotAttributes> {}
 
-@Table
+@Table({ paranoid: false })
 export class EmployeeParkingLot extends Model<
 	EmployeeParkingLotAttributes,
 	EmployeeParkingLotAddAttributes

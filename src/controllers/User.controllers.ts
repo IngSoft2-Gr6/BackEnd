@@ -120,7 +120,6 @@ export const login = async (req: any, res: any) => {
 		verifyEmployeeToken(req, res);
 		const [err, rolesToAdd] = await until(user.$add("roles", 4));
 		if (err) return responseJson(res, 500, err.message);
-		if (!rolesToAdd) return responseJson(res, 400, "Roles not added");
 
 		res.locals.user = user;
 		await assignEmployee(req, res);
