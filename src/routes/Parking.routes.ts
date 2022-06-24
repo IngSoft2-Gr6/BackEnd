@@ -10,7 +10,7 @@ import {
 } from "@controllers/Parking.controllers";
 import { getParkingLotInfo } from "@middlewares/parking.middleware";
 import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
-import { addEmployee } from "@controllers/Employee.controllers";
+import { addEmployee, getEmployees } from "@controllers/Employee.controllers";
 
 const router = Router();
 
@@ -23,7 +23,11 @@ router
 	.patch(getCurrentUserInfo, updateParking)
 	.delete(getCurrentUserInfo, deleteParking);
 
-router.route("/:parkingLotId/employee").post(getCurrentUserInfo, addEmployee);
+router
+	.route("/:parkingLotId/employee")
+	.get(getCurrentUserInfo, getEmployees)
+	.post(getCurrentUserInfo, addEmployee);
+
 
 router
 	.route("/:parkingLotId/businessHours")

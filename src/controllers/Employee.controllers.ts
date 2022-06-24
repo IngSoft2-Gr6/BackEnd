@@ -66,3 +66,21 @@ export const addEmployee = async (req: any, res: any) => {
 
 	return responseJson(res, 200, "Mail sent to Employee");
 };
+
+export const getEmployees = async (req: any, res: any) => {
+	const user = res.locals.user as User;
+	const parkingLot = res.locals.parkingLot as ParkingLot;
+
+	if (!(user.id === parkingLot.ownerId)) {
+		return responseJson(res, 401, "Incorrect parkingLot Owner");
+	}
+
+	const [err, employees] = await until(
+		EmployeeParkingLot.findAll({ where: { parkingLotId: parkingLot.id } })
+	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!employees) return responseJson(res, 404, "Employees not found");
+
+	return responseJson(res, 200, "Employees retrieved successfully", employees);
+};
+
