@@ -58,5 +58,5 @@ export class Vehicle extends Model<VehicleAttributes, VehicleAddAttributes> {
 	year?: number;
 
 	@HasMany(() => ParkingHistory)
-	parkingHistories!: Array<ParkingHistory>;
+	parkingHistory!: Array<ParkingHistory>;
 }
