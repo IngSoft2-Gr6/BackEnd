@@ -62,8 +62,8 @@ export const manageParkingHistory = async (req: any, res: any) => {
 	}
 
 	const actions = {
-		minute: () => Math.round(parkingDuration.toMinutes()) * parkingLot.fee,
-		hour: () => Math.round(parkingDuration.toHours()) * parkingLot.fee,
+		minute: () => Math.ceil(parkingDuration.toMinutes()) * parkingLot.fee,
+		hour: () => Math.ceil(parkingDuration.toHours()) * parkingLot.fee,
 	};
 
 	// calculate the amount to be paid
@@ -77,7 +77,7 @@ export const manageParkingHistory = async (req: any, res: any) => {
 		parkingDuration: [
 			Math.round(parkingDuration.toHours()),
 			Math.round(parkingDuration.toMinutes()) % 60,
-			Math.round(parkingDuration.toSeconds() % (60 * 60)),
+			Math.round(parkingDuration.toSeconds() % 60),
 		],
 		amountToBePaid,
 		parkingHistoryUpdate,

@@ -23,7 +23,7 @@ export interface ParkingLotAttributes {
 	coords: Array<number>;
 	fee: number;
 	feePer: "minute" | "hour";
-	minFee: number;
+	minFee?: number;
 	capacity: number;
 	keyNeeded: boolean;
 	ownerId: string;
