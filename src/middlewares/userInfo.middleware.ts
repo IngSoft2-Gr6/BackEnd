@@ -1,8 +1,14 @@
 import { verifyToken } from "@middlewares/auth.middleware";
 import { User } from "@models/User.model";
 import { responseJson } from "@helpers/response";
+import { subtract as subtractDate } from "date-and-time";
 
 import until from "@helpers/until";
+import ms from "ms";
+
+const { USER_VERIFICATION_THRESHOLD_TIME } = process.env as {
+	[key: string]: string;
+};
 
 export const getCurrentUserInfo = async (req: any, res: any, next: any) => {
 	return verifyToken(req, res, async () => {
@@ -15,6 +21,37 @@ export const getCurrentUserInfo = async (req: any, res: any, next: any) => {
 		if (!user) return responseJson(res, 404, "User not found");
 
 		res.locals.user = user;
+		next();
+	});
+};
+
+export const getCurrentVerifiedUserInfo = async (
+	req: any,
+	res: any,
+	next: any
+) => {
+	return getCurrentUserInfo(req, res, async () => {
+		const user = res.locals.user as User;
+		if (!user.verified) {
+			const threshold_time_ms = ms(USER_VERIFICATION_THRESHOLD_TIME);
+
+			// User might have created an account but not verified it yet
+			const time_since_last_update = subtractDate(
+				new Date(),
+				user.updatedAt
+			).toMilliseconds();
+
+			if (time_since_last_update >= threshold_time_ms) {
+				//TODO: Delete user (deactivate)
+
+				// This isn't a 410 because this could be temporary
+				return responseJson(res, 404, "User does not exist");
+			}
+			//TODO: Add warning to response
+			//TODO: Send email to user?
+			return responseJson(res, 403, "User not verified");
+		}
+
 		next();
 	});
 };
