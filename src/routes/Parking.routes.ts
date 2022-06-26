@@ -15,6 +15,7 @@ import {
 	deleteEmployee,
 	getEmployees,
 } from "@controllers/Employee.controllers";
+import { manageParkingHistory } from "@controllers/ParkingHistory.controllers";
 
 const router = Router();
 
@@ -40,5 +41,9 @@ router
 	.route("/:parkingLotId/businessHours")
 	.put(updateBusinessHours)
 	.delete(deleteBusinessHours);
+
+router
+	.route("/:parkingLotId/history")
+	.put(getCurrentUserInfo, manageParkingHistory);
 
 export default router;
