@@ -32,3 +32,14 @@ export const addVehicleByDriver = async (req: any, res: any) => {
 
 	return responseJson(res, 201, "Vehicle created successfully", vehicle);
 };
+
+export const getVehicles = async (req: any, res: any) => {
+	const user = res.locals.user as User;
+
+	return responseJson(
+		res,
+		200,
+		"Vehicles retrieved successfully",
+		user.vehicles
+	);
+};
