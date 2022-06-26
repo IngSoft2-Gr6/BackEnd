@@ -3,6 +3,8 @@ import { Vehicle, VehicleAddAttributes } from "@models/Vehicle.model";
 import { User } from "@models/User.model";
 
 import until from "@helpers/until";
+import { ParkingHistory } from "@models/ParkingHistory.model";
+import { Op } from "sequelize";
 
 export const addVehicleByDriver = async (req: any, res: any) => {
 	const user = res.locals.user as User;
@@ -43,4 +45,54 @@ export const getVehicles = async (req: any, res: any) => {
 	if (!vehicles) return responseJson(res, 204, "No vehicles found");
 
 	return responseJson(res, 200, "Vehicles retrieved successfully", vehicles);
+};
+
+export const getDriverParkingHistory = async (req: any, res: any) => {
+	const user = res.locals.user as User;
+
+	// map user.vehicles to get parking history
+	const [err, parkingHistory] = await until(
+		ParkingHistory.findAll({
+			where: {
+				vehicleId: {
+					[Op.in]: user.vehicles.map((vehicle: any) => vehicle.id),
+				},
+			},
+			include: [{ all: true }],
+			order: [["createdAt", "DESC"]],
+		})
+	);
+	if (err) return responseJson(res, 500, err.message);
+	return responseJson(
+		res,
+		200,
+		"Parking history retrieved successfully",
+		parkingHistory
+	);
+};
+
+export const getVehicleParkingHistory = async (req: any, res: any) => {
+	const user = res.locals.user as User;
+	const { vehicleId } = req.params;
+
+	const [err, parkingHistory] = await until(
+		ParkingHistory.findAll({
+			where: {
+				vehicleId,
+			},
+			include: [{ all: true }],
+			order: [["createdAt", "DESC"]],
+		})
+	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!parkingHistory) {
+		return responseJson(res, 204, "No parking history found");
+	}
+
+	return responseJson(
+		res,
+		200,
+		"Parking history retrieved successfully",
+		parkingHistory
+	);
 };

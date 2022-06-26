@@ -4,7 +4,6 @@ import { ParkingHistory } from "@models/ParkingHistory.model";
 import { ParkingLot } from "@models/ParkingLot.model";
 import { User } from "@models/User.model";
 import date from "date-and-time";
-import ms from "ms";
 
 export const manageParkingHistory = async (req: any, res: any) => {
 	const parkingLot = res.locals.parkingLot as ParkingLot;
@@ -84,25 +83,11 @@ export const manageParkingHistory = async (req: any, res: any) => {
 	});
 };
 
-export const getParkingHistory = async (req: any, res: any) => {
+export const getParkingLotHistory = async (req: any, res: any) => {
 	const parkingLot = res.locals.parkingLot as ParkingLot;
-	const user = res.locals.user as User;
-	const { vehicleId } = req.body;
 
-	// check that vehicle owner is the same user
-	if (user.vehicles.find((v) => v.id === vehicleId) === undefined) {
-		return responseJson(res, 400, "Vehicle owner is not the same user");
-	}
-
-	// get the latest parking history
 	const [err, parkingHistory] = await until(
-		ParkingHistory.findAll({
-			where: {
-				vehicleId,
-				parkingLotId: parkingLot.id,
-			},
-			order: [["createdAt", "DESC"]],
-		})
+		parkingLot.$get("parkingHistory", { include: [{ all: true }] })
 	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!parkingHistory) {
