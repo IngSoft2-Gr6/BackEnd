@@ -36,10 +36,11 @@ export const addVehicleByDriver = async (req: any, res: any) => {
 export const getVehicles = async (req: any, res: any) => {
 	const user = res.locals.user as User;
 
-	return responseJson(
-		res,
-		200,
-		"Vehicles retrieved successfully",
-		user.vehicles
+	const [err, vehicles] = await until(
+		user.$get("vehicles", { include: [{ all: true }] })
 	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!vehicles) return responseJson(res, 204, "No vehicles found");
+
+	return responseJson(res, 200, "Vehicles retrieved successfully", vehicles);
 };
