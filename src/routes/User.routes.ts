@@ -11,7 +11,10 @@ import {
 	recover,
 } from "@controllers/User.controllers";
 
-import { getCurrentUserInfo } from "@middlewares/userInfo.middleware";
+import {
+	getCurrentUserInfo,
+	getCurrentVerifiedUserInfo,
+} from "@middlewares/userInfo.middleware";
 
 const router = Router();
 
@@ -28,7 +31,11 @@ router.route("/password/reset").post(resetPassword);
 
 // All routes refering to /**/profile/* require userInfo middleware
 router.route("/profile*").all(getCurrentUserInfo);
-router.route("/profile").get(getUser).patch(updateUser).delete(deleteUser);
+router
+	.route("/profile")
+	.get(getUser)
+	.patch(getCurrentVerifiedUserInfo, updateUser)
+	.delete(deleteUser);
 
 // router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 // FIXME: This should use a custom middleware and different controllers

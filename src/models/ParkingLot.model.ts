@@ -56,7 +56,6 @@ export class ParkingLot extends Model<
 	@Column
 	address!: string;
 
-	// TODO: Change to a coordinate object
 	@AllowNull(false)
 	@Column(DataType.ARRAY(DataType.DECIMAL))
 	coords!: Array<number>;
