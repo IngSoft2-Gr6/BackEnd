@@ -1,5 +1,6 @@
 import { verifyToken } from "@middlewares/auth.middleware";
 import { User } from "@models/User.model";
+import { deleteUser } from "@controllers/User.controllers";
 import { responseJson } from "@helpers/response";
 import { subtract as subtractDate } from "date-and-time";
 
@@ -44,10 +45,14 @@ export const getCurrentVerifiedUserInfo = async (
 			).toMilliseconds();
 
 			if (time_since_last_update >= threshold_time_ms) {
-				//TODO: Delete user (deactivate)
-
 				// This isn't a 410 because this could be temporary
-				return responseJson(res, 404, "User does not exist");
+				res.locals.overwriteResponse = {
+					status: 404,
+					message: "User not found",
+				};
+
+				// Response will be overwritten by the previous object
+				return deleteUser(req, res);
 			}
 			//TODO: Add warning to response
 			//TODO: Send email to user?

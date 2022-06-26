@@ -215,6 +215,7 @@ export const updateUser = async (req: any, res: any) => {
 
 export const deleteUser = async (req: any, res: any) => {
 	const user = res.locals.user as User;
+	const overwriteResponse = res.locals.overwriteResponse;
 
 	// Verified should be set to false
 	const [errorUpdating, userUpdated] = await until(
@@ -230,6 +231,14 @@ export const deleteUser = async (req: any, res: any) => {
 
 	if (errorDeleting) return responseJson(res, 500, errorDeleting.message);
 	if (!userDeleted) return responseJson(res, 400, "User not deleted");
+
+	if (overwriteResponse) {
+		return responseJson(
+			res,
+			overwriteResponse.status,
+			overwriteResponse.message
+		);
+	}
 
 	// No further information, deleted successfully
 	return responseJson(res, 204);
