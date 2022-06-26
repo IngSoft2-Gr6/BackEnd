@@ -22,7 +22,9 @@ import { enforceFormat } from "@utils/datetime";
 
 export const getAllParkings = async (_req: any, res: any) => {
 	// TODO: Add pagination
-	const [err, parkings] = await until(ParkingLot.findAll());
+	const [err, parkings] = await until(
+		ParkingLot.findAll({ include: [{ all: true }] })
+	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!parkings) return responseJson(res, 204, "No parkings found");
 	return responseJson(res, 200, "Parking retrieved successfully", parkings);

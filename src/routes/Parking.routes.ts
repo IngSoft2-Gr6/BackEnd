@@ -16,7 +16,7 @@ import {
 	getEmployees,
 } from "@controllers/Employee.controllers";
 import {
-	getParkingHistory,
+	getParkingLotHistory,
 	manageParkingHistory,
 } from "@controllers/ParkingHistory.controllers";
 
@@ -47,7 +47,7 @@ router
 
 router
 	.route("/:parkingLotId/history")
-	.get(getCurrentUserInfo, getParkingHistory)
+	.get(getCurrentUserInfo, getParkingLotHistory)
 	.put(getCurrentUserInfo, manageParkingHistory);
 
 export default router;

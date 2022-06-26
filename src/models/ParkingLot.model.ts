@@ -84,13 +84,13 @@ export class ParkingLot extends Model<
 	ownerId!: string;
 
 	@BelongsToMany(() => User, () => EmployeeParkingLot)
-	Employees!: Array<User & { EmployeeParkingLot: EmployeeParkingLot }>;
+	employees!: Array<User & { EmployeeParkingLot: EmployeeParkingLot }>;
 
 	@BelongsToMany(() => User, () => Rating)
-	RatingParkingLot!: Array<User & { Rating: Rating }>;
+	ratingParkingLot!: Array<User & { Rating: Rating }>;
 
 	@HasMany(() => ParkingHistory)
-	ParkingHistories!: Array<ParkingHistory>;
+	parkingHistory!: Array<ParkingHistory>;
 
 	@HasMany(() => BusinessHours)
 	businessHours!: Array<BusinessHours>;
