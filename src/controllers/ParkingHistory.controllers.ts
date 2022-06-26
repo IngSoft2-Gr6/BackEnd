@@ -83,3 +83,33 @@ export const manageParkingHistory = async (req: any, res: any) => {
 		parkingHistoryUpdate,
 	});
 };
+
+export const getParkingHistory = async (req: any, res: any) => {
+	const parkingLot = res.locals.parkingLot as ParkingLot;
+	const user = res.locals.user as User;
+	const { vehicleId } = req.body;
+
+	// check that vehicle owner is the same user
+	if (user.vehicles.find((v) => v.id === vehicleId) === undefined) {
+		return responseJson(res, 400, "Vehicle owner is not the same user");
+	}
+
+	// get the latest parking history
+	const [err, parkingHistory] = await until(
+		ParkingHistory.findAll({
+			where: {
+				vehicleId,
+				parkingLotId: parkingLot.id,
+			},
+			order: [["createdAt", "DESC"]],
+		})
+	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!parkingHistory) {
+		return responseJson(res, 400, "Parking history not found");
+	}
+
+	return responseJson(res, 200, "Parking history found successfully", {
+		parkingHistory,
+	});
+};
