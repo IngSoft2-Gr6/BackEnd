@@ -14,7 +14,7 @@ import { Vehicle } from "./Vehicle.model";
 
 export interface ParkingHistoryAttributes {
 	id: string;
-	parkingLotTd: string;
+	parkingLotId: string;
 	vehicleId: string;
 	bookingStartTime?: Date;
 	bookingEndTime?: Date;
