@@ -22,6 +22,8 @@ export interface ParkingLotAttributes {
 	address: string;
 	coords: Array<number>;
 	fee: number;
+	feePer: "minute" | "hour";
+	minFee: number;
 	capacity: number;
 	keyNeeded: boolean;
 	ownerId: string;
@@ -62,6 +64,13 @@ export class ParkingLot extends Model<
 	@AllowNull(false)
 	@Column(DataType.DOUBLE)
 	fee!: number;
+
+	@AllowNull(false)
+	@Column(DataType.ENUM("minute", "hour"))
+	feePer!: string;
+
+	@Column({ defaultValue: 0, type: DataType.DOUBLE })
+	minFee!: number;
 
 	@AllowNull(false)
 	@Column
