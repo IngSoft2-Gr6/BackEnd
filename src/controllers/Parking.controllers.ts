@@ -22,7 +22,9 @@ import { enforceFormat } from "@utils/datetime";
 
 export const getAllParkings = async (_req: any, res: any) => {
 	// TODO: Add pagination
-	const [err, parkings] = await until(ParkingLot.findAll());
+	const [err, parkings] = await until(
+		ParkingLot.findAll({ include: [{ all: true }] })
+	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!parkings) return responseJson(res, 204, "No parkings found");
 	return responseJson(res, 200, "Parking retrieved successfully", parkings);
@@ -89,6 +91,8 @@ export const updateParking = async (req: any, res: any) => {
 };
 
 export const updateBusinessHours = async (req: any, res: any) => {
+	//FIXME: Check that the user who is updating this ParkingLot is the owner
+
 	const { id: parkingLotId } = res.locals.parkingLot as ParkingLot;
 
 	const businessHoursNew: BusinessHoursPatchAttributes[] = req.body;
@@ -143,6 +147,8 @@ export const updateBusinessHours = async (req: any, res: any) => {
 };
 
 export const deleteBusinessHours = async (req: any, res: any) => {
+	//FIXME: Check that the user who is updating this ParkingLot is the owner
+
 	const { id: parkingLotId } = res.locals.parkingLot as ParkingLot;
 	const { days }: { days: number[] } = req.body;
 
