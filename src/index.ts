@@ -13,7 +13,9 @@ import generate from "./data";
 
 // Settings
 const app = express();
-const port = process.env.API_PORT || 4000;
+const port = process.env.API_PORT || 8080;
+
+const isDevelopment = process.env.NODE_ENV === "development";
 
 app.disable("x-powered-by");
 
@@ -47,14 +49,17 @@ app.use("/api/v1/", require("./routes/").default);
 
 // Start server
 db.sequelize
-	.sync({ force: process.env.NODE_ENV === "development" })
+	.sync({ force: isDevelopment })
 	.then(async () => {
-		console.log("Database & tables created!");
-		await generate(["Role", "IdentityCardType", "VehicleType"]);
+		if (isDevelopment) {
+			console.log("Database & tables created!");
+			await generate(["Role", "IdentityCardType", "VehicleType"]);
+		}
 	})
 	.then(() => {
 		app.listen(port, () => {
 			// print url
+			console.log(`Server running in ${process.env.NODE_ENV} mode`);
 			console.log(`Server running on http://localhost:${port}`);
 		});
 	})
