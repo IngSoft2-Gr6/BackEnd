@@ -4,6 +4,10 @@ import {
 	Model,
 	Table,
 	DataType,
+	AllowNull,
+	PrimaryKey,
+	Scopes,
+	IsUUID,
 } from "sequelize-typescript";
 import { ParkingLot } from "./ParkingLot.model";
 
@@ -16,8 +20,16 @@ export interface BusinessHoursAttributes {
 }
 export interface BusinessHoursAddAttributes
 	extends Omit<BusinessHoursAttributes, "id"> {}
+export interface BusinessHoursPatchAttributes
+	extends Partial<BusinessHoursAttributes> {}
 
 @Table
+// remove paranoid mode for this table
+@Scopes(() => ({
+	defaultScope: {
+		paranoid: false,
+	},
+}))
 export class BusinessHours extends Model<
 	BusinessHoursAttributes,
 	BusinessHoursAddAttributes
@@ -25,12 +37,15 @@ export class BusinessHours extends Model<
 	@ForeignKey(() => ParkingLot)
 	parkingLotId!: string;
 
+	@AllowNull(false)
 	@Column({ type: DataType.INTEGER, validate: { min: 1, max: 7 } })
 	day!: number;
 
+	@AllowNull(false)
 	@Column(DataType.TIME)
 	openTime!: Date;
 
+	@AllowNull(false)
 	@Column(DataType.TIME)
 	closeTime!: Date;
 }

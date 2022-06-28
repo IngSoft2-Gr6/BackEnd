@@ -6,6 +6,7 @@ import {
 	ForeignKey,
 	HasMany,
 	DataType,
+	AllowNull,
 } from "sequelize-typescript";
 
 import { User } from "./User.model";
@@ -27,6 +28,8 @@ export interface ParkingLotAttributes {
 }
 export interface ParkingLotAddAttributes
 	extends Omit<ParkingLotAttributes, "id"> {}
+export interface ParkingLotPatchAttributes
+	extends Partial<ParkingLotAttributes> {}
 
 @Table
 export class ParkingLot extends Model<
@@ -40,25 +43,31 @@ export class ParkingLot extends Model<
 	})
 	id!: string;
 
+	@AllowNull(false)
 	@Column
 	name!: string;
 
 	@Column(DataType.TEXT)
 	description?: string;
 
+	@AllowNull(false)
 	@Column
 	address!: string;
 
 	// TODO: Change to a coordinate object
+	@AllowNull(false)
 	@Column(DataType.ARRAY(DataType.DECIMAL))
 	coords!: Array<number>;
 
+	@AllowNull(false)
 	@Column(DataType.DOUBLE)
 	fee!: number;
 
+	@AllowNull(false)
 	@Column
 	capacity!: number;
 
+	@AllowNull(false)
 	@Column
 	keyNeeded!: boolean;
 

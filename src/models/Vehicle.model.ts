@@ -5,6 +5,7 @@ import {
 	ForeignKey,
 	DataType,
 	HasMany,
+	AllowNull,
 } from "sequelize-typescript";
 import { ParkingHistory } from "./ParkingHistory.model";
 
@@ -23,6 +24,7 @@ export interface VehicleAttributes {
 }
 
 export interface VehicleAddAttributes extends Omit<VehicleAttributes, "id"> {}
+export interface VehiclePatchAttributes extends Partial<VehicleAttributes> {}
 
 @Table
 export class Vehicle extends Model<VehicleAttributes, VehicleAddAttributes> {
@@ -39,6 +41,7 @@ export class Vehicle extends Model<VehicleAttributes, VehicleAddAttributes> {
 	@ForeignKey(() => VehicleType)
 	vehicleTypeId!: number;
 
+	@AllowNull(false)
 	@Column
 	plate!: string;
 
