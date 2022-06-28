@@ -15,6 +15,7 @@
 		"@helpers": "./dist/helpers"
 	},
 	"scripts": {
+		"prestart": "yarn install --frozen-lockfile && yarn build",
 		"start": "node dist/index.js",
 		"start-inspect": "node --inspect dist/index.js",
 		"build": "tsc",
