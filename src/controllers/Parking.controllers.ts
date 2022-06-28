@@ -9,6 +9,12 @@ import {
 	ParkingLotAddAttributes,
 	ParkingLotPatchAttributes,
 } from "@models/ParkingLot.model";
+
+import {
+	Rating,
+	RatingAddAttributes,
+	RatingPatchAttributes,
+} from "@models/Rating.model";
 import { responseJson } from "@helpers/response";
 import { User } from "@models/User.model";
 import {
@@ -201,3 +207,41 @@ export const deleteParking = async (req: any, res: any) => {
 		parkingLotDeleted
 	);
 };
+
+export const addRatingParking = async (req: any, res: any) => {
+	const ratingAtt: RatingAddAttributes = { ...req.body };
+	const parkingLot = res.locals.parkingLot as ParkingLot;
+	const user = res.locals.user as User;
+
+	const [err, rating] = await until(
+		Rating.upsert({
+			...ratingAtt,
+			parkingLotId: parkingLot.id,
+			driverId: user.id,
+		})
+	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!rating) return responseJson(res, 400, "Rating not created");
+
+	return responseJson(res, 200, "Rating añadido exitosamente", rating);
+};
+
+export const getRatingParking = async (req: any, res: any) => {
+	const ratingAtt: RatingAddAttributes = { ...req.body };
+	const parkingLot = res.locals.parkingLot as ParkingLot;
+	const user = res.locals.user as User;
+
+	const [err, rating] = await until(
+		Rating.upsert({
+			...ratingAtt,
+			parkingLotId: parkingLot.id,
+			driverId: user.id,
+		})
+	);
+	if (err) return responseJson(res, 500, err.message);
+	if (!rating) return responseJson(res, 400, "Rating not created");
+
+	return responseJson(res, 200, "Rating añadido exitosamente", rating);
+};
+
+

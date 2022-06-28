@@ -10,7 +10,7 @@ import { User } from "./User.model";
 
 export interface RatingAttributes {
 	driverId: string;
-	parkingLotID: string;
+	parkingLotId: string;
 	commentParkingLot?: string;
 	commentDriver?: string;
 	ratingParkingLot?: number;

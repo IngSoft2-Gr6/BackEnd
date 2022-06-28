@@ -7,6 +7,8 @@ import {
 	registerParking,
 	updateBusinessHours,
 	updateParking,
+	addRatingParking,
+	getRatingParking,
 } from "@controllers/Parking.controllers";
 import { getParkingLotInfo } from "@middlewares/parking.middleware";
 import {
@@ -52,5 +54,10 @@ router
 	.route("/:parkingLotId/history")
 	.get(getCurrentVerifiedUserInfo, getParkingLotHistory)
 	.put(getCurrentVerifiedUserInfo, manageParkingHistory);
+
+router
+	.route("/:parkingLotId/rating")
+	.get(getCurrentVerifiedUserInfo, getRatingParking)
+	.post(getCurrentVerifiedUserInfo, addRatingParking);
 
 export default router;
