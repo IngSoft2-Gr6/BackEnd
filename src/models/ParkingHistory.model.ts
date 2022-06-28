@@ -7,6 +7,7 @@ import {
 	Default,
 	PrimaryKey,
 	AllowNull,
+	BelongsTo,
 } from "sequelize-typescript";
 
 import { ParkingLot } from "./ParkingLot.model";
@@ -14,7 +15,7 @@ import { Vehicle } from "./Vehicle.model";
 
 export interface ParkingHistoryAttributes {
 	id: string;
-	parkingLotTd: string;
+	parkingLotId: string;
 	vehicleId: string;
 	bookingStartTime?: Date;
 	bookingEndTime?: Date;
@@ -41,8 +42,14 @@ export class ParkingHistory extends Model<
 	@ForeignKey(() => ParkingLot)
 	parkingLotId!: string;
 
+	@BelongsTo(() => ParkingLot)
+	parkingLot!: ParkingLot;
+
 	@ForeignKey(() => Vehicle)
 	vehicleId!: string;
+
+	@BelongsTo(() => Vehicle)
+	vehicle!: Vehicle;
 
 	@Column
 	bookingStartTime?: Date;

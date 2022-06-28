@@ -6,46 +6,43 @@ import {
 	DataType,
 	AllowNull,
 	PrimaryKey,
-	Scopes,
-	IsUUID,
 } from "sequelize-typescript";
 import { ParkingLot } from "./ParkingLot.model";
 
+export const TimeFormat = "HH:mm:ss";
+
 export interface BusinessHoursAttributes {
-	id: number;
-	parkingLotID: string;
+	parkingLotId: string;
 	day: number;
-	openTime: Date;
-	closeTime: Date;
+	openTime: string;
+	closeTime: string;
 }
-export interface BusinessHoursAddAttributes
-	extends Omit<BusinessHoursAttributes, "id"> {}
+export interface BusinessHoursAddAttributes extends BusinessHoursAttributes {}
 export interface BusinessHoursPatchAttributes
 	extends Partial<BusinessHoursAttributes> {}
 
-@Table
-// remove paranoid mode for this table
-@Scopes(() => ({
-	defaultScope: {
-		paranoid: false,
-	},
-}))
+@Table({
+	// remove paranoid mode for this table
+	paranoid: false,
+})
 export class BusinessHours extends Model<
 	BusinessHoursAttributes,
 	BusinessHoursAddAttributes
 > {
+	@PrimaryKey
 	@ForeignKey(() => ParkingLot)
+	@Column({ type: DataType.UUID })
 	parkingLotId!: string;
 
-	@AllowNull(false)
+	@PrimaryKey
 	@Column({ type: DataType.INTEGER, validate: { min: 1, max: 7 } })
 	day!: number;
 
 	@AllowNull(false)
 	@Column(DataType.TIME)
-	openTime!: Date;
+	openTime!: string;
 
 	@AllowNull(false)
 	@Column(DataType.TIME)
-	closeTime!: Date;
+	closeTime!: string;
 }

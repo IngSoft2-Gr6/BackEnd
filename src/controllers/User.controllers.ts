@@ -1,15 +1,27 @@
 import { User } from "@models/User.model";
 import { Role } from "@models/Role.model";
 import { responseJson } from "@helpers/response";
-import { until } from "@helpers/until";
 import { sendMail } from "@services/mail.service";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import ms from "ms";
+import until from "@helpers/until";
+import { addMilliseconds } from "date-and-time";
+import { assignEmployee, verifyEmployeeToken } from "./Employee.controllers";
+
+const {
+	JWT_SECRET,
+	USER_TOKEN_EXPIRATION_TIME,
+	FRONT_URL,
+	MAIL_TOKEN_EXPIRATION_TIME,
+} = process.env as {
+	[key: string]: string;
+};
 
 export const getAllUsers = async (_req: any, res: any) => {
 	// TODO: Add pagination
-	const [err, users] = await until(User.findAll({ include: [Role] }));
+	const [err, users] = await until(User.findAll({ include: [{ all: true }] }));
 	if (err) return responseJson(res, 500, err.message);
 	if (!users) return responseJson(res, 204, "No users found");
 	return responseJson(res, 200, "User retrieved successfully", users);
@@ -18,6 +30,10 @@ export const getAllUsers = async (_req: any, res: any) => {
 export const signup = async (req: any, res: any) => {
 	const userAtt = { ...req.body, roleId: undefined };
 	const roleId: number = req.body.roleId;
+
+	const isEmployee = req.body.token && roleId == 4;
+
+	if (isEmployee) verifyEmployeeToken(req, res);
 
 	// Hash password
 	const salt = await bcrypt.genSalt();
@@ -33,19 +49,32 @@ export const signup = async (req: any, res: any) => {
 	if (err2) return responseJson(res, 500, err2.message);
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
-		expiresIn: "1h",
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
-	const url = `${process.env.FRONT_URL}/users/verify/account?token=${token}`;
-	const [err3, mail] = await until(
-		//TODO: Add more information rather than just the url
-		sendMail(user.email, "Account verification", url)
-	);
+	console.log("User created successfully", "Sending email");
+	if (!user.email) return responseJson(res, 400, "User email not found");
 
+	const [err3, mail] = await until(
+		sendMail({
+			to: user.email,
+			subject: "Account verification",
+			placeholders: {
+				userName: user.name.split(" ")[0],
+				url: `${FRONT_URL}/users/verify/account?token=${token}`,
+			},
+		})
+	);
 	if (err3) return responseJson(res, 500, err3.message);
 	if (!mail) return responseJson(res, 400, "Mail not sent");
+
+	// if user isEmployee assign to the corresponding parkingLot
+	if (isEmployee) {
+		res.locals.user = user;
+		await assignEmployee(req, res);
+	}
 
 	return responseJson(res, 201, "User created successfully", user);
 };
@@ -54,7 +83,8 @@ export const verifyAccount = async (req: any, res: any) => {
 	const { token } = req.body;
 	if (!token) return responseJson(res, 400, "Token not provided");
 
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	// TODO: Add error handling
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	// Find user
@@ -71,17 +101,42 @@ export const verifyAccount = async (req: any, res: any) => {
 
 export const login = async (req: any, res: any) => {
 	const { email, password } = req.body;
-	const [err, user] = await until(User.findOne({ where: { email } }));
+
+	if (!email || !password) {
+		return responseJson(res, 400, "Email or password not provided");
+	}
+
+	const [err, user] = await until(
+		User.findOne({ where: { email: (email as string).trim() } })
+	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!user) return responseJson(res, 404, "User not found");
 	const isMatch = await bcrypt.compare(password, user.password);
 	if (!isMatch) return responseJson(res, 401, "Invalid credentials");
 
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
-		expiresIn: "30s", // expires in 30 seconds for testing
+	const isEmployee = req.body.token;
+	if (isEmployee) {
+		// If user isEmployee assign to the corresponding parkingLot
+		verifyEmployeeToken(req, res);
+		const [err, rolesToAdd] = await until(user.$add("roles", 4));
+		if (err) return responseJson(res, 500, err.message);
+
+		res.locals.user = user;
+		await assignEmployee(req, res);
+	}
+
+	// Expiration time between the token and cookie might differ by a few milliseconds
+	const expires = addMilliseconds(new Date(), ms(USER_TOKEN_EXPIRATION_TIME));
+
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: USER_TOKEN_EXPIRATION_TIME,
 	});
-	res.cookie("token", token, { httpOnly: true });
-	return responseJson(res, 200, "User logged in successfully", user);
+
+	res.cookie("token", token, { httpOnly: true, expires });
+	return responseJson(res, 200, "User logged in successfully", {
+		...user,
+		expires,
+	});
 };
 
 export const resetPassword = async (req: any, res: any) => {
@@ -90,7 +145,7 @@ export const resetPassword = async (req: any, res: any) => {
 	if (!token) return responseJson(res, 400, "Token not provided");
 
 	// verify token
-	const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+	const decoded = jwt.verify(token, JWT_SECRET) as any;
 	if (!decoded) return responseJson(res, 400, "Invalid token");
 
 	const [err, user] = await until(User.findOne({ where: { id: decoded.id } }));
@@ -120,14 +175,20 @@ export const recover = async (req: any, res: any) => {
 	if (!user) return responseJson(res, 404, "User not found");
 
 	// Create token with user id
-	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "", {
-		expiresIn: "1h",
+	const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+		expiresIn: MAIL_TOKEN_EXPIRATION_TIME,
 	});
 
 	// Send mail for verification
-	const url = `${process.env.FRONT_URL}/password/reset?token=${token}`;
 	const [err2, mail] = await until(
-		sendMail(user.email, "Password recovery", url)
+		sendMail({
+			to: user.email,
+			subject: "Password recovery",
+			placeholders: {
+				userName: user.name.split(" ")[0],
+				url: `${FRONT_URL}/users/password/reset?token=${token}`,
+			},
+		})
 	);
 
 	if (err2) return responseJson(res, 500, err2.message);
@@ -137,28 +198,19 @@ export const recover = async (req: any, res: any) => {
 };
 
 export const getUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-
-	const [err, user] = await until(User.findByPk(userId, { include: [Role] }));
-	if (err) return responseJson(res, 500, err.message);
-	if (!user) return responseJson(res, 404, "User not found");
-
-	return responseJson(res, 200, "User retrieved successfully", user);
+	// Make sure userInfo middleware is run before this
+	return responseJson(res, 200, "User retrieved successfully", res.locals.user);
 };
 
 export const updateUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-	const user = { ...req.body, roleId: undefined };
+	const newUserInfo = { ...req.body, roleId: undefined };
+
 	let roleId: number | number[] = req.body.roleId;
-	if (!roleId) return responseJson(res, 400, "No role id provided");
 
-	const [err, userFound] = await until(User.findByPk(userId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!userFound) return responseJson(res, 404, "User not found");
+	// Make sure userInfo middleware is run before this
+	const userFound = res.locals.user as User;
 
-	const [err2, userUpdated] = await until(userFound.update(user));
+	const [err2, userUpdated] = await until(userFound.update(newUserInfo));
 	if (err2) return responseJson(res, 500, err2.message);
 	if (!userUpdated) return responseJson(res, 400, "User not updated");
 
@@ -184,13 +236,32 @@ export const updateUser = async (req: any, res: any) => {
 };
 
 export const deleteUser = async (req: any, res: any) => {
-	const userId: string = req.params.id || req.decoded.id;
-	if (!userId) return responseJson(res, 400, "No user id provided");
-	const [err, user] = await until(User.findByPk(userId));
-	if (err) return responseJson(res, 500, err.message);
-	if (!user) return responseJson(res, 404, "User not found");
-	const [err2, userDeleted] = await until(user.destroy({ include: [Role] }));
-	if (err2) return responseJson(res, 500, err2.message);
+	const user = res.locals.user as User;
+	const overwriteResponse = res.locals.overwriteResponse;
+
+	// Verified should be set to false
+	const [errorUpdating, userUpdated] = await until(
+		user.update({ verified: false })
+	);
+
+	if (errorUpdating) return responseJson(res, 500, errorUpdating.message);
+	if (!userUpdated) {
+		return responseJson(res, 400, "User could not be deactivated");
+	}
+
+	const [errorDeleting, userDeleted] = await until(userUpdated.destroy());
+
+	if (errorDeleting) return responseJson(res, 500, errorDeleting.message);
 	if (!userDeleted) return responseJson(res, 400, "User not deleted");
-	return responseJson(res, 200, "User deleted successfully", userDeleted);
+
+	if (overwriteResponse) {
+		return responseJson(
+			res,
+			overwriteResponse.status,
+			overwriteResponse.message
+		);
+	}
+
+	// No further information, deleted successfully
+	return responseJson(res, 204);
 };

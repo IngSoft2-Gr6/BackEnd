@@ -9,8 +9,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import db from "@models/index";
-
-const { Role, IdentityCardType } = db.Models;
+import generate from "./data";
 
 // Settings
 const app = express();
@@ -18,8 +17,26 @@ const port = process.env.API_PORT || 4000;
 
 app.disable("x-powered-by");
 
+// Exception handlers
+process.on("uncaughtException", (error) => {
+	console.error("Uncaught exception: ", error);
+	process.exit(1); // exit application
+});
+
+process.on("unhandledRejection", (error, promise) => {
+	console.error("Unhandled promise: ", promise);
+	console.error("The error was: ", error);
+});
+
 // Middlewares
-app.use(cors());
+app.use(
+	cors({
+		origin: [process.env.FRONT_URL as string],
+		credentials: true,
+		exposedHeaders: ["set-cookie"],
+	})
+);
+
 app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
@@ -33,19 +50,7 @@ db.sequelize
 	.sync({ force: process.env.NODE_ENV === "development" })
 	.then(async () => {
 		console.log("Database & tables created!");
-		// create default roles
-		await Role.bulkCreate([
-			{ name: "admin" },
-			{ name: "driver" },
-			{ name: "owner" },
-			{ name: "employee" },
-		]);
-		// create default identity card types
-		await IdentityCardType.bulkCreate([
-			{ name: "Identity Card" },
-			{ name: "Passport" },
-			{ name: "Driving License" },
-		]);
+		await generate(["Role", "IdentityCardType", "VehicleType"]);
 	})
 	.then(() => {
 		app.listen(port, () => {
