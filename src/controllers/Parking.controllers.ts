@@ -240,9 +240,19 @@ export const getRatingParking = async (req: any, res: any) => {
 	);
 
 	if (err) return responseJson(res, 500, err.message);
-	if (!rating) return responseJson(res, 400, "Rating not created");
+	if (!ratings) return responseJson(res, 400, "Rate not found");
 
-	return responseJson(res, 200, "Rating añadido exitosamente", rating);
+	//Get users' names
+	const uids = Array.from(new Set(ratings.map((r) => r.driverId)));
+	const [err2, users] = await until(User.findAll({ where: { id: uids } }));
+
+	if (err2) return responseJson(res, 500, err2.message);
+	if (!users) return responseJson(res, 400, "Users not found");
+
+	const usersMap = ratings.map((r: Rating) => {
+		const user = users.find((u) => u.id === r.driverId);
+		return { ...(r as any).dataValues, driverName: user?.name };
+	});
+
+	return responseJson(res, 200, "Rating found successfully", usersMap);
 };
-
-
