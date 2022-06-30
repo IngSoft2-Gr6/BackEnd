@@ -228,17 +228,17 @@ export const addRatingParking = async (req: any, res: any) => {
 };
 
 export const getRatingParking = async (req: any, res: any) => {
-	const ratingAtt: RatingAddAttributes = { ...req.body };
 	const parkingLot = res.locals.parkingLot as ParkingLot;
-	const user = res.locals.user as User;
 
-	const [err, rating] = await until(
-		Rating.upsert({
-			...ratingAtt,
-			parkingLotId: parkingLot.id,
-			driverId: user.id,
+	const [err, ratings] = await until(
+		Rating.findAll({
+			where: {
+				parkingLotId: parkingLot.id,
+			},
+			order: [["updatedAt", "DESC"]],
 		})
 	);
+
 	if (err) return responseJson(res, 500, err.message);
 	if (!rating) return responseJson(res, 400, "Rating not created");
 
