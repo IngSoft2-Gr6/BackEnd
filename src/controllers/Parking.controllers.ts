@@ -220,10 +220,11 @@ export const addRatingParking = async (req: any, res: any) => {
 			driverId: user.id,
 		})
 	);
-	if (err) return responseJson(res, 500, err.message);
-	if (!rating) return responseJson(res, 400, "Rating not created");
 
-	return responseJson(res, 200, "Rating añadido exitosamente", rating);
+	if (err) return responseJson(res, 500, err.message);
+	if (!rating) return responseJson(res, 400, "Rate not created");
+
+	return responseJson(res, 200, "Rate added successfully", rating);
 };
 
 export const getRatingParking = async (req: any, res: any) => {
