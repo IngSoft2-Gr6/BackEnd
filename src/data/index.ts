@@ -11,7 +11,9 @@ const generate = async (
 		return;
 	}
 
-	await (db.Models[name] as any).bulkCreate(require(`./${name}`).data);
+	await (db.Models[name] as any).bulkCreate(require(`./${name}`).data, {
+		updateOnDuplicate: ["id"],
+	});
 
 	console.log(`${name} generated`);
 };

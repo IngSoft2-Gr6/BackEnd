@@ -41,9 +41,12 @@ export const manageParkingHistory = async (req: any, res: any) => {
 		if (!newParkingHistory) {
 			return responseJson(res, 400, "Parking history not created");
 		}
-		return responseJson(res, 200, "Parking history created successfully", {
-			newParkingHistory,
-		});
+		return responseJson(
+			res,
+			200,
+			"Parking history created successfully",
+			newParkingHistory
+		);
 	}
 
 	const parkingStartTime = parkingHistory.parkingStartTime as Date;
@@ -79,7 +82,7 @@ export const manageParkingHistory = async (req: any, res: any) => {
 			Math.round(parkingDuration.toSeconds() % 60),
 		],
 		amountToBePaid,
-		parkingHistoryUpdate,
+		...parkingHistoryUpdate.get({ plain: true }),
 	});
 };
 
@@ -87,14 +90,20 @@ export const getParkingLotHistory = async (req: any, res: any) => {
 	const parkingLot = res.locals.parkingLot as ParkingLot;
 
 	const [err, parkingHistory] = await until(
-		parkingLot.$get("parkingHistory", { include: [{ all: true }] })
+		parkingLot.$get("parkingHistory", {
+			include: [{ all: true }],
+			order: [["createdAt", "DESC"]],
+		})
 	);
 	if (err) return responseJson(res, 500, err.message);
 	if (!parkingHistory) {
 		return responseJson(res, 400, "Parking history not found");
 	}
 
-	return responseJson(res, 200, "Parking history found successfully", {
-		parkingHistory,
-	});
+	return responseJson(
+		res,
+		200,
+		"Parking history found successfully",
+		parkingHistory
+	);
 };
