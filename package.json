@@ -16,14 +16,15 @@
 	},
 	"scripts": {
 		"prestart": "yarn install --frozen-lockfile && yarn build",
-		"start": "node dist/index.js",
+		"start:dev": "node dist/index.js",
+		"start": "NODE_ENV=production node dist/index.js",
 		"start-inspect": "node --inspect dist/index.js",
 		"build": "tsc",
 		"clean": "rm -rf ./dist",
 		"clean-build": "yarn clean && yarn build",
-		"normal-build-start": "yarn build && yarn start",
+		"normal-build-start": "yarn build && yarn start:dev",
 		"normal-build-start-inspect": "yarn build && yarn start-inspect",
-		"clean-start": "yarn clean && yarn build && yarn start",
+		"clean-start": "yarn clean && yarn build && yarn start:dev",
 		"clean-start-inspect": "yarn clean && yarn build && yarn start-inspect",
 		"dev": "nodemon -L --watch \"./src/\" -e ts,js,json --exec \"yarn normal-build\""
 	},
